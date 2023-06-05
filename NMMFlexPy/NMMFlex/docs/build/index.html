@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Welcome to NMMFlex’s documentation! &#8212; NMMFlex 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">NMMFlex 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to NMMFlex’s documentation!</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="welcome-to-nmmflex-s-documentation">
+<h1>Welcome to NMMFlex’s documentation!<a class="headerlink" href="#welcome-to-nmmflex-s-documentation" title="Permalink to this heading">¶</a></h1>
+<p>Introducing NMMFlex, a Python package that enhances and extends the functionality of the Non-negative Multiple Matrix Factorization (NMMF) algorithm. This innovative solution, originally proposed by <a class="reference external" href="https://www.ijcai.org/Proceedings/13/Papers/254.pdf">Takeuchi et al. (2013)</a>, has been refined and adapted through our package to maximize its potential. NMMFlex offers an advanced implementation, bringing significant improvements and bespoke modifications to the core NMMF algorithm.</p>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+<div class="toctree-wrapper compound">
+</div>
+<section id="module-NMMFlex">
+<span id="public-and-internal-functions"></span><h2>Public and internal functions<a class="headerlink" href="#module-NMMFlex" title="Permalink to this heading">¶</a></h2>
+<p>NMMFlex: Non-negative Multiple Matrix Factorization.
+Comments follow the <a class="reference external" href="https://peps.python.org/pep-0257/">https://peps.python.org/pep-0257/</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NMMFlex.</span></span><span class="sig-name descname"><span class="pre">NMMFlex</span></span><a class="headerlink" href="#NMMFlex.NMMFlex" title="Permalink to this definition">¶</a></dt>
+<dd><p>A flexible and modular implementation of Non-negative Multiple Matrix Factorization (NMMF) as NMMFlex</p>
+<p>This class provides multiple variations and configurations of the NMF algorithm,
+making it adaptable to a wide range of problems.</p>
+<p>The main feature is the incorporation of additional constraints, beyond the basic
+non-negativity, which can improve the interpretability and usefulness of the results.</p>
+<dl class="simple">
+<dt>Key configurations and features include:</dt><dd><ul class="simple">
+<li><p>Regularization on factor matrices</p></li>
+<li><p>Proportion constraints</p></li>
+<li><p>Option to fix certain factor matrices</p></li>
+<li><p>Grid search functionality with parallel execution</p></li>
+<li><p>Preprocessing methods for handling sparse data</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._analyse_sparsity_matrix">
+<span class="sig-name descname"><span class="pre">_analyse_sparsity_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._analyse_sparsity_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates and returns the sparsity information of a given matrix in a textual format. The function calculates
+three types of sparsity: total sparsity (includes both zeros and nulls/Nan), zero sparsity (only zeros),
+and null sparsity (only nulls/Nan).</p>
+<p>If the matrix is empty, a message indicating that is returned.</p>
+<p>Parameters:
+matrix : array-like
+The matrix to analyze for sparsity.
+matrix_name : str
+The name of the matrix. Used in the returned description text.</p>
+<p>Returns:
+description_text : str
+Textual information about the matrix’s sparsity. If the matrix is empty, a message stating that is returned.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._assign_global_variables">
+<span class="sig-name descname"><span class="pre">_assign_global_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fixed_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_new</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_new</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_new</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_new</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">running_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">divergence_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_divergence_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_regularizer_w</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._assign_global_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns global variables in the class instance using the given parameters. It handles NaN values by replacing
+them with -1 to avoid errors, especially for compatibility with R.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fixed_w</strong> (<em>type</em>) – These are flags indicating whether the respective matrices are</p></li>
+<li><p><strong>fixed_h</strong> (<em>type</em>) – These are flags indicating whether the respective matrices are</p></li>
+<li><p><strong>fixed_a</strong> (<em>type</em>) – These are flags indicating whether the respective matrices are</p></li>
+<li><p><strong>fixed_b</strong> (<em>type</em>) – These are flags indicating whether the respective matrices are</p></li>
+<li><p><strong>fixed.</strong> – </p></li>
+<li><p><strong>x</strong> (<em>DataFrame</em>) – Input data matrices.</p></li>
+<li><p><strong>y</strong> (<em>DataFrame</em>) – Input data matrices.</p></li>
+<li><p><strong>z</strong> (<em>DataFrame</em>) – Input data matrices.</p></li>
+<li><p><strong>x_hat</strong> (<em>DataFrame</em>) – Estimated data matrices.</p></li>
+<li><p><strong>y_hat</strong> (<em>DataFrame</em>) – Estimated data matrices.</p></li>
+<li><p><strong>z_hat</strong> (<em>DataFrame</em>) – Estimated data matrices.</p></li>
+<li><p><strong>w_new</strong> (<em>DataFrame</em>) – Newly calculated matrices W, H, A, B.</p></li>
+<li><p><strong>h_new</strong> (<em>DataFrame</em>) – Newly calculated matrices W, H, A, B.</p></li>
+<li><p><strong>a_new</strong> (<em>DataFrame</em>) – Newly calculated matrices W, H, A, B.</p></li>
+<li><p><strong>b_new</strong> (<em>DataFrame</em>) – Newly calculated matrices W, H, A, B.</p></li>
+<li><p><strong>running_info</strong> (<em>np.ndarray</em>) – Information collected during the algorithm’s run such as iteration number and</p></li>
+<li><p><strong>values.</strong> (<em>divergence</em>) – </p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Parameters of the deconvolution model.</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – Parameters of the deconvolution model.</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – Number of clusters/groups (rank).</p></li>
+<li><p><strong>iterations</strong> (<em>int</em>) – Number of iterations performed.</p></li>
+<li><p><strong>divergence_value</strong> (<em>float</em>) – Value of divergence.</p></li>
+<li><p><strong>delta_divergence_value</strong> (<em>float</em>) – Change in divergence value.</p></li>
+<li><p><strong>alpha_regularizer_w</strong> (<em>float</em>) – Regularization parameter for W matrix.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None. The method updates class instance attributes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_a_new_extended">
+<span class="sig-name descname"><span class="pre">_calculate_a_new_extended</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_a_new_extended" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is a part of an extended non-negative matrix factorization (NMF) model. It updates the ‘a’
+matrix which is one of the factor matrices in this model. The updating process takes into account the original
+matrix ‘y’, the current estimate of this matrix ‘y_hat’, the current version of the factor matrix ‘a’, and the
+other factor matrix ‘h’.</p>
+<p>In this process, each element of the matrix ‘a’ is updated based on a ratio: the numerator is the sum of a
+series of products - each product involves an element of ‘y’, its corresponding element in ‘y_hat’, and a
+corresponding element in ‘h’; the denominator is simply the sum of a series of elements in ‘h’. The element in
+‘a’ is then multiplied by this ratio.</p>
+<p>The function returns the updated version of the ‘a’ matrix.</p>
+<p>Parameters:
+y : array-like
+The original matrix that is being factorized.</p>
+<dl class="simple">
+<dt>y_hat<span class="classifier">array-like</span></dt><dd><p>The current estimate of the original matrix ‘y’.</p>
+</dd>
+<dt>a<span class="classifier">array-like</span></dt><dd><p>The current version of the factor matrix ‘a’ that needs to be updated.</p>
+</dd>
+<dt>h<span class="classifier">array-like</span></dt><dd><p>The other factor matrix involved in the NMF model.</p>
+</dd>
+</dl>
+<p>Returns:
+a_new : array-like
+The updated version of the ‘a’ matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_a_new_extended_generic">
+<span class="sig-name descname"><span class="pre">_calculate_a_new_extended_generic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_sparse</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_a_new_extended_generic" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates an updated version of the matrix ‘h’ for sparse data matrices, using constraints
+from the ‘alpha’ parameter. This function is used in matrix factorization techniques, where ‘w’ and ‘h’ are
+the factor matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em><em> or </em><em>csr_matrix</em>) – The original matrix that is being factorized.</p></li>
+<li><p><strong>x_hat</strong> (<em>np.ndarray</em>) – The current estimate of the original matrix ‘x’ from the product of ‘w’ and ‘h’.</p></li>
+<li><p><strong>w</strong> (<em>np.ndarray</em>) – The current estimate of the factor matrix ‘w’.</p></li>
+<li><p><strong>h</strong> (<em>np.ndarray</em>) – The current estimate of the factor matrix ‘h’.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – A constraint parameter on the transformation.</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em><em> or </em><em>csr_matrix</em>) – An additional original matrix that is being factorized.</p></li>
+<li><p><strong>y_hat</strong> (<em>np.ndarray</em>) – The current estimate of the original matrix ‘y’.</p></li>
+<li><p><strong>a</strong> (<em>np.ndarray</em>) – The current estimate of an additional factor matrix ‘a’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated version of the ‘h’ matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>h_new (np.ndarray)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Procedure:</dt><dd><ol class="arabic simple">
+<li><p>Initializes a new zero matrix ‘h_new’ of the same shape as ‘h’.</p></li>
+<li><p>Ensures that ‘x’ and ‘y’ are in the csr_matrix format for sparse matrices.</p></li>
+<li><dl class="simple">
+<dt>For each element in ‘h_new’, it computes the corresponding element in ‘h_new’ using a multiplicative</dt><dd><p>update rule that is based on ‘x’, ‘x_hat’, ‘w’, ‘h’, ‘alpha’, ‘y’, ‘y_hat’, and ‘a’.</p>
+</dd>
+</dl>
+</li>
+<li><p>Returns ‘h_new’.</p></li>
+</ol>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The updates are based on a form of multiplicative update rule that is common in NMF. The goal is to make
+‘x_hat’ (the product of ‘w’ and ‘h’) and ‘y_hat’ (the product of ‘a’ and ‘h’) as close to ‘x’ and ‘y’ as
+possible.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_a_new_extended_sparse">
+<span class="sig-name descname"><span class="pre">_calculate_a_new_extended_sparse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_a_new_extended_sparse" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is an enhanced version of the one that updates the ‘a’ matrix in an extended non-negative matrix
+factorization (NMF) model, specifically designed for sparse matrices. It works similarly to the original
+function, but with special handling for sparse matrix formats and NaN values.</p>
+<p>The original matrix ‘y’ and the current estimate ‘y_hat’ of it should be in sparse format for efficiency. If ‘y’
+is not sparse, it will be converted to a sparse format. Then, each element of ‘a’ is updated using a ratio
+similar to that in the original function, but with a consideration for potential NaN values in the ‘y’, ‘y_hat’,
+‘h’ matrices.</p>
+<p>The function returns the updated ‘a’ matrix.</p>
+<p>Parameters:
+y : csr_matrix or array-like
+The original matrix that is being factorized. It should be a sparse csr_matrix, if not, it will be converted.</p>
+<dl class="simple">
+<dt>y_hat<span class="classifier">array-like</span></dt><dd><p>The current estimate of the original matrix ‘y’.</p>
+</dd>
+<dt>a<span class="classifier">array-like</span></dt><dd><p>The current version of the factor matrix ‘a’ that needs to be updated.</p>
+</dd>
+<dt>h<span class="classifier">array-like</span></dt><dd><p>The other factor matrix involved in the NMF model.</p>
+</dd>
+</dl>
+<p>Returns:
+a_new : array-like
+The updated version of the ‘a’ matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_b_new_extended">
+<span class="sig-name descname"><span class="pre">_calculate_b_new_extended</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_b_new_extended" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the updated version of the ‘b’ matrix in an extended non-negative matrix factorization
+(NMF) model. It follows a standard multiplicative update rule, where each element of ‘b’ is updated by
+multiplying its current value by a ratio of two terms. The numerator of the ratio is a sum over all rows of the
+original matrix ‘z’, where each term in the sum is the product of an element of ‘z’ divided by the corresponding
+element of the estimated matrix ‘z_hat’, and an element of the other factor matrix ‘w’. The denominator of the
+ratio is the sum of the corresponding elements of ‘w’.</p>
+<p>This function is meant for dense or standard data structures. For sparse data, use the corresponding sparse
+function.</p>
+<p>Parameters:
+z : array-like
+The original matrix that is being factorized.</p>
+<dl class="simple">
+<dt>z_hat<span class="classifier">array-like</span></dt><dd><p>The current estimate of the original matrix ‘z’.</p>
+</dd>
+<dt>b<span class="classifier">array-like</span></dt><dd><p>The current version of the factor matrix ‘b’ that needs to be updated.</p>
+</dd>
+<dt>w<span class="classifier">array-like</span></dt><dd><p>The other factor matrix involved in the NMF model.</p>
+</dd>
+</dl>
+<p>Returns:
+b_new : array-like
+The updated version of the ‘b’ matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_b_new_extended_generic">
+<span class="sig-name descname"><span class="pre">_calculate_b_new_extended_generic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_sparse</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_b_new_extended_generic" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function updates the ‘b’ matrix in an extended non-negative matrix factorization (NMF) model. It supports
+both standard and sparse data structures, by choosing the appropriate calculation function based on the
+‘is_sparse’ parameter.</p>
+<p>In particular, if the ‘is_sparse’ flag is set to True, the function uses the method designed for sparse
+matrices, otherwise, it uses the standard method.</p>
+<p>Parameters:
+z : csr_matrix or array-like
+The original matrix that is being factorized. It should be a sparse csr_matrix for the sparse method.</p>
+<dl class="simple">
+<dt>z_hat<span class="classifier">array-like</span></dt><dd><p>The current estimate of the original matrix ‘z’.</p>
+</dd>
+<dt>b<span class="classifier">array-like</span></dt><dd><p>The current version of the factor matrix ‘b’ that needs to be updated.</p>
+</dd>
+<dt>w<span class="classifier">array-like</span></dt><dd><p>The other factor matrix involved in the NMF model.</p>
+</dd>
+<dt>is_sparse<span class="classifier">boolean</span></dt><dd><p>A flag indicating whether the data structure is sparse or standard. If True, the sparse method is used.</p>
+</dd>
+</dl>
+<p>Returns:
+b_new : array-like
+The updated version of the ‘b’ matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_b_new_extended_sparse">
+<span class="sig-name descname"><span class="pre">_calculate_b_new_extended_sparse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_b_new_extended_sparse" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the updated version of the ‘b’ matrix in an extended non-negative matrix factorization
+(NMF) model, optimized for sparse matrices. It follows a standard multiplicative update rule, where each element
+of ‘b’ is updated by multiplying its current value by a ratio of two terms. The numerator of the ratio is a sum
+over all rows of the original matrix ‘z’, where each term in the sum is the product of an element of ‘z’ divided
+by the corresponding element of the estimated matrix ‘z_hat’, and an element of the other factor matrix ‘w’. The
+denominator of the ratio is the sum of the corresponding elements of ‘w’.</p>
+<p>This function is meant for sparse data structures. For dense data, use the corresponding dense function.</p>
+<p>Parameters:
+z : sparse matrix
+The original matrix that is being factorized. It must be a sparse matrix (preferably in CSR format).</p>
+<dl class="simple">
+<dt>z_hat<span class="classifier">array-like</span></dt><dd><p>The current estimate of the original matrix ‘z’.</p>
+</dd>
+<dt>b<span class="classifier">array-like</span></dt><dd><p>The current version of the factor matrix ‘b’ that needs to be updated.</p>
+</dd>
+<dt>w<span class="classifier">array-like</span></dt><dd><p>The other factor matrix involved in the NMF model.</p>
+</dd>
+</dl>
+<p>Returns:
+b_new : array-like
+The updated version of the ‘b’ matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_divergence_extended">
+<span class="sig-name descname"><span class="pre">_calculate_divergence_extended</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_hat</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_divergence_extended" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the divergence matrix for the original matrix ‘x’ and the estimated matrix ‘x_hat’.
+The divergence matrix is a measure of the difference between each corresponding element of ‘x’ and ‘x_hat’.</p>
+<p>The divergence is computed using the general form of Kullback-Leibler divergence formula for each element in the
+matrices, which measures how one probability distribution diverges from a second, expected probability
+distribution.</p>
+<p>Parameters:
+x : array-like
+The original matrix that is being factorized.</p>
+<dl class="simple">
+<dt>x_hat<span class="classifier">array-like</span></dt><dd><p>The current estimate of the original matrix ‘x’.</p>
+</dd>
+</dl>
+<p>Returns:
+divergence_matrix : array-like
+The matrix where each element is the divergence between the corresponding elements of ‘x’ and ‘x_hat’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_divergence_generic">
+<span class="sig-name descname"><span class="pre">_calculate_divergence_generic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_sparse</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_divergence_generic" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function computes the divergence between the original matrix ‘x’ and the estimated matrix ‘x_hat’.
+The divergence is a measure of how much the estimated matrix differs from the original matrix. The function uses
+a general form of Kullback-Leibler divergence formula, which is a measure of how one probability distribution
+diverges from a second, expected probability distribution.</p>
+<p>The function supports both sparse and dense matrices. For sparse matrices, a specific function optimized for
+sparse computations is called.</p>
+<p>Parameters:
+x : array-like or sparse matrix
+The original matrix that is being factorized.</p>
+<dl class="simple">
+<dt>x_hat<span class="classifier">array-like</span></dt><dd><p>The current estimate of the original matrix ‘x’.</p>
+</dd>
+<dt>is_sparse<span class="classifier">bool</span></dt><dd><p>Whether the input matrix is sparse (True) or dense (False).</p>
+</dd>
+</dl>
+<p>Returns:
+divergence : float
+The divergence between the original matrix and its estimate.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_divergence_sparse">
+<span class="sig-name descname"><span class="pre">_calculate_divergence_sparse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_hat</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_divergence_sparse" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the Kullback-Leibler (KL) divergence between two matrices ‘x’ and ‘x_hat’, specifically
+designed for the case when ‘x’ is a sparse matrix and ‘x_hat’ is its dense approximation. The KL-divergence is
+used as a measure of how one probability distribution is different from a second, expected probability
+distribution.</p>
+<p>Due to the sparsity of ‘x’, the computation may encounter NaN (Not a Number) or inf (infinity) values.
+This function addresses these scenarios, replacing NaN or inf with zeros for a valid divergence computation.</p>
+<p>This function employs the ‘lil_matrix’ format for efficient computation due to the sparsity structure of ‘x’.
+When ‘x’ is not in ‘csr_matrix’ format, it is converted into ‘csr_matrix’ before computation.</p>
+<p>Parameters:
+x : array-like, sparse matrix
+The original matrix that is being factorized. Must be a sparse matrix.</p>
+<dl class="simple">
+<dt>x_hat<span class="classifier">array-like, dense matrix</span></dt><dd><p>The current estimate of the original matrix ‘x’.</p>
+</dd>
+</dl>
+<p>Returns:
+divergence_matrix : array-like, sparse matrix
+The sparse matrix where each element is the divergence between the corresponding elements of ‘x’ and ‘x_hat’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_h_new_extended">
+<span class="sig-name descname"><span class="pre">_calculate_h_new_extended</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proportion_constraint</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_h_new_extended" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates a new version of the matrix ‘h’ by applying certain transformations and checks.
+This function is typically used in the context of matrix factorization techniques such as non-negative matrix
+factorization (NMF), where ‘w’ and ‘h’ are the two factor matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – The original matrix that is being factorized.</p></li>
+<li><p><strong>x_hat</strong> (<em>np.ndarray</em>) – The current estimate of the original matrix ‘x’ from the product of ‘w’ and ‘h’.</p></li>
+<li><p><strong>w</strong> (<em>np.ndarray</em>) – The current estimate of the factor matrix ‘w’.</p></li>
+<li><p><strong>h</strong> (<em>np.ndarray</em>) – The current estimate of the factor matrix ‘h’.</p></li>
+<li><p><strong>proportion_constraint</strong> (<em>bool</em>) – A flag indicating whether a proportion constraint should be applied to the
+new ‘h’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated version of the ‘h’ matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>h_new (np.ndarray)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Procedure:</dt><dd><ol class="arabic simple">
+<li><p>Initializes a new zero matrix ‘h_new’ of the same shape as ‘h’.</p></li>
+<li><dl class="simple">
+<dt>For each element in ‘h’, it computes a new value based on the corresponding elements in ‘x’, ‘x_hat’,</dt><dd><p>and ‘w’.</p>
+</dd>
+</dl>
+</li>
+<li><p>If the ‘proportion_constraint’ flag is set to True, it applies a proportion constraint to ‘h_new’.</p></li>
+<li><p>Returns ‘h_new’.</p></li>
+</ol>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The updates are based on a form of multiplicative update rule that is common in NMF. The goal is to make
+‘x_hat’ (the product of ‘w’ and ‘h’) as close to ‘x’ as possible.
+The ‘proportion_constraint’ refers to any additional constraints that might need to be applied on ‘h’ to
+ensure that the factorization meets certain criteria.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_h_new_extended_alpha_beta">
+<span class="sig-name descname"><span class="pre">_calculate_h_new_extended_alpha_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_h_new_extended_alpha_beta" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates an updated version of the matrix ‘h’ given the constraints of the ‘alpha’ parameter.
+It is a specialized version of the previous method that works specifically for non-sparse data. This function
+is used in matrix factorization techniques, where ‘w’ and ‘h’ are the factor matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – The original matrix that is being factorized.</p></li>
+<li><p><strong>x_hat</strong> (<em>np.ndarray</em>) – The current estimate of the original matrix ‘x’ from the product of ‘w’ and ‘h’.</p></li>
+<li><p><strong>w</strong> (<em>np.ndarray</em>) – The current estimate of the factor matrix ‘w’.</p></li>
+<li><p><strong>h</strong> (<em>np.ndarray</em>) – The current estimate of the factor matrix ‘h’.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – A constraint parameter on the transformation.</p></li>
+<li><p><strong>y</strong> (<em>np.ndarray</em>) – An additional original matrix that is being factorized.</p></li>
+<li><p><strong>y_hat</strong> (<em>np.ndarray</em>) – The current estimate of the original matrix ‘y’.</p></li>
+<li><p><strong>a</strong> (<em>np.ndarray</em>) – The current estimate of an additional factor matrix ‘a’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated version of the ‘h’ matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>h_new (np.ndarray)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Procedure:</dt><dd><ol class="arabic simple">
+<li><p>Initializes a new zero matrix ‘h_new’ of the same shape as ‘h’.</p></li>
+<li><dl class="simple">
+<dt>For each element in ‘h_new’, it computes the corresponding element in ‘h_new’ using a multiplicative</dt><dd><p>update rule that is based on ‘x’, ‘x_hat’, ‘w’, ‘h’, ‘alpha’, ‘y’, ‘y_hat’, and ‘a’.</p>
+</dd>
+</dl>
+</li>
+<li><p>Returns ‘h_new’.</p></li>
+</ol>
+</dd>
+</dl>
+<p>Note:
+The updates are based on a form of multiplicative update rule that is common in NMF. The goal is to make ‘x_hat’
+(the product of ‘w’ and ‘h’) and ‘y_hat’ (the product of ‘a’ and ‘h’) as close to ‘x’ and ‘y’ as possible.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_h_new_extended_alpha_beta_generic">
+<span class="sig-name descname"><span class="pre">_calculate_h_new_extended_alpha_beta_generic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proportion_constraint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_sparse</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_h_new_extended_alpha_beta_generic" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates an updated version of the matrix ‘h’ considering an additional constraint on ‘alpha’
+and potentially dealing with sparse matrices. This function is typically used in the context of matrix
+factorization techniques, where ‘w’ and ‘h’ are the two factor matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>Any</em>) – The original matrix that is being factorized.</p></li>
+<li><p><strong>x_hat</strong> (<em>Any</em>) – The current estimate of the original matrix ‘x’ from the product of ‘w’ and ‘h’.</p></li>
+<li><p><strong>w</strong> (<em>Any</em>) – The current estimate of the factor matrix ‘w’.</p></li>
+<li><p><strong>h</strong> (<em>Any</em>) – The current estimate of the factor matrix ‘h’.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – A constraint parameter on the transformation.</p></li>
+<li><p><strong>y</strong> (<em>Any</em>) – An additional original matrix that is being factorized.</p></li>
+<li><p><strong>y_hat</strong> (<em>Any</em>) – The current estimate of the original matrix ‘y’.</p></li>
+<li><p><strong>a</strong> (<em>Any</em>) – The current estimate of an additional factor matrix ‘a’.</p></li>
+<li><p><strong>proportion_constraint</strong> (<em>bool</em>) – A flag indicating whether a proportion constraint should be applied to the
+new ‘h’.</p></li>
+<li><p><strong>is_sparse</strong> (<em>bool</em>) – A flag indicating whether the input matrices are sparse.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated version of the ‘h’ matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>h_new (np.ndarray)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Procedure:</dt><dd><ol class="arabic simple">
+<li><p>Initializes a new zero matrix ‘h_new’ of the same shape as ‘h’.</p></li>
+<li><dl class="simple">
+<dt>If the ‘is_sparse’ flag is True, it calls a separate method to compute ‘h_new’ specifically for sparse</dt><dd><p>matrices, else it calls the general method for the same.</p>
+</dd>
+</dl>
+</li>
+<li><p>If the ‘proportion_constraint’ flag is set to True, it applies a proportion constraint to ‘h_new’.</p></li>
+<li><p>Returns ‘h_new’.</p></li>
+</ol>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The updates are based on a form of multiplicative update rule that is common in NMF. The goal is to make
+‘x_hat’ (the product of ‘w’ and ‘h’) and ‘y_hat’ (the product of ‘a’ and ‘h’) as close to ‘x’ and ‘y’
+as possible.
+The ‘proportion_constraint’ refers to any additional constraints that might need to be applied on ‘h’
+to ensure that the factorization meets certain criteria.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_h_new_extended_alpha_beta_sparse">
+<span class="sig-name descname"><span class="pre">_calculate_h_new_extended_alpha_beta_sparse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_h_new_extended_alpha_beta_sparse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the new values for matrix H based on X, X_hat, W, H, Y, Y_hat, A, and alpha for sparse inputs.
+This is part of the update rules in Non-negative Matrix Factorization models.</p>
+<p>The function works with sparse matrices and processes them efficiently.
+In case the input matrices X and Y are not sparse, they will be converted to sparse format.</p>
+<p>Parameters:
+x : csr_matrix
+Input matrix X. If not in csr_matrix format, will be converted to it.</p>
+<dl class="simple">
+<dt>x_hat<span class="classifier">array-like</span></dt><dd><p>Estimated matrix X.</p>
+</dd>
+<dt>w<span class="classifier">array-like</span></dt><dd><p>Matrix W.</p>
+</dd>
+<dt>h<span class="classifier">array-like</span></dt><dd><p>Matrix H, values of which will be updated.</p>
+</dd>
+<dt>alpha<span class="classifier">float</span></dt><dd><p>A parameter in the NMF model which weights the divergence of Y and AH in the loss function.</p>
+</dd>
+<dt>y<span class="classifier">csr_matrix</span></dt><dd><p>Input matrix Y. If not in csr_matrix format, will be converted to it.</p>
+</dd>
+<dt>y_hat<span class="classifier">array-like</span></dt><dd><p>Estimated matrix Y.</p>
+</dd>
+<dt>a<span class="classifier">array-like</span></dt><dd><p>Matrix A.</p>
+</dd>
+</dl>
+<p>Returns:
+h_new : array-like
+Updated matrix H based on X, X_hat, W, H, Y, Y_hat, A, and alpha.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_k_values_labels">
+<span class="sig-name descname"><span class="pre">_calculate_k_values_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fixed_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_k_values_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the labels for the k-values, which are based on the columns of input matrices,
+namely W, A, H, and B. These labels are required for ranking and denoting the k-values.</p>
+<p>The function behavior depends on the existence of the input matrices:
+1. If matrix W is provided, the labels will be derived from the column names of matrix W. Additionally,
+the rows of matrices H and B and the columns of matrix A will be assigned these column names.
+2. If only matrix A is provided, the labels will be the column names of matrix A. The column names of matrix W,
+as well as the row names for matrices H and B, will be assigned these column names.
+3. If both matrices W and A are provided, their column names should match. In this case, the labels will be
+derived from the column names of matrix W, and the rows of matrices H and B will be assigned these column
+names.</p>
+<dl class="simple">
+<dt>If none of the matrices are provided, a default set of labels will be generated. Each label will be in the</dt><dd><p>format ‘rank_k’, where k represents the rank.</p>
+</dd>
+</dl>
+<p>Please note that the function will also return an error message if none of the matrices are fixed,
+or a notification if at least one matrix is fixed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fixed_w</strong> (<em>pd.DataFrame</em>) – Fixed W matrix with labels.</p></li>
+<li><p><strong>fixed_h</strong> (<em>pd.DataFrame</em>) – Fixed H matrix with labels.</p></li>
+<li><p><strong>fixed_a</strong> (<em>pd.DataFrame</em>) – Fixed A matrix with labels.</p></li>
+<li><p><strong>fixed_b</strong> (<em>pd.DataFrame</em>) – Fixed B matrix with labels.</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – The number of ranks for which labels need to be generated when no fixed matrix is provided.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An array of strings representing labels for the k-values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>k_values (np.array)</p>
+</dd>
+</dl>
+<p>Note: This function needs to be unit tested.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_w_new_extended">
+<span class="sig-name descname"><span class="pre">_calculate_w_new_extended</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_w_new_extended" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates a new ‘w’ matrix using an extended version of the update rule often used in algorithms
+such as Non-negative Matrix Factorization. The rule involves division, multiplication, and summing operations on
+the matrices ‘w’, ‘x’, ‘x_hat’, and ‘h’.</p>
+<p>The function first initializes an all-zeros matrix ‘w_new’ of the same size as ‘w’. Then, for each element of
+‘w_new’, it computes a fraction where the numerator is a weighted sum of elements from ‘x’ and ‘h’ and the
+denominator is the sum of elements from ‘h’. This fraction is then multiplied by the corresponding element from
+‘w’ to get the updated value for ‘w_new’.</p>
+<p>Please note, this function does not currently account for sparseness (zero values) in its computation. This
+should be considered when enhancing the function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – The ‘x’ matrix in the current context. It should be numeric and compatible with ‘x_hat’ for</p></li>
+<li><p><strong>division.</strong> (<em>compatible with 'x' for</em>) – </p></li>
+<li><p><strong>x_hat</strong> (<em>np.ndarray</em>) – The ‘x_hat’ matrix as calculated in the current context. It should be numeric and</p></li>
+<li><p><strong>division.</strong> – </p></li>
+<li><p><strong>w</strong> (<em>np.ndarray</em>) – The initial ‘w’ matrix. It should be numeric.</p></li>
+<li><p><strong>h</strong> (<em>np.ndarray</em>) – The ‘h’ matrix in the current context. It should be numeric.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated ‘w’ matrix as calculated by the function’s rule.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>w_new (np.ndarray)</p>
+</dd>
+</dl>
+<p>Note: This function needs to be updated to handle sparseness (zero values).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_w_new_extended_alpha_beta">
+<span class="sig-name descname"><span class="pre">_calculate_w_new_extended_alpha_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularize_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_regularizer_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_w_new_extended_alpha_beta" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates a new ‘w’ matrix using a comprehensive extended update rule that could be applied in
+algorithms such as Non-negative Matrix Factorization. The rule involves complex computations based on the input
+matrices, regularization parameters, and an optional sparsity constraint.</p>
+<p>The function first initializes an all-zeros matrix ‘w_new’ of the same size as ‘w’. Then, for each element of
+‘w_new’, it computes a complex fraction where the numerator is a sum of two terms - one based on ‘x’ and ‘h’,
+and another based on ‘z’, ‘b’, and ‘beta’. The denominator is also a sum of two terms - one based on ‘h’ and
+another based on ‘b’, ‘beta’, and optional regularization based on ‘alpha_regularizer_w’.</p>
+<p>In the computation, the function supports three types of regularizer functions for ‘w’ - ‘lasso_sparcity’,
+‘medecom_soft_binary’, and ‘medecom_soft_binary_derived’. After the computation, the function may also apply
+additional regularization to ‘w_new’ based on ‘regularize_w’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em>) – The ‘x’ matrix in the current context. It should be numeric and compatible with ‘x_hat’
+for division.</p></li>
+<li><p><strong>x_hat</strong> (<em>np.ndarray</em>) – The ‘x_hat’ matrix as calculated in the current context. It should be numeric and
+compatible with ‘x’ for division.</p></li>
+<li><p><strong>w</strong> (<em>np.ndarray</em>) – The initial ‘w’ matrix. It should be numeric.</p></li>
+<li><p><strong>h</strong> (<em>np.ndarray</em>) – The ‘h’ matrix in the current context. It should be numeric.</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – The beta regularization parameter for the update rule.</p></li>
+<li><p><strong>z</strong> (<em>np.ndarray</em>) – The ‘z’ matrix in the current context. It should be numeric and compatible with ‘z_hat’
+for division.</p></li>
+<li><p><strong>z_hat</strong> (<em>np.ndarray</em>) – The ‘z_hat’ matrix as calculated in the current context. It should be numeric and
+compatible with ‘z’ for division.</p></li>
+<li><p><strong>b</strong> (<em>np.ndarray</em>) – The ‘b’ matrix in the current context. It should be numeric.</p></li>
+<li><p><strong>regularize_w</strong> (<em>float</em>) – The regularization parameter for the ‘w’ matrix.</p></li>
+<li><p><strong>alpha_regularizer_w</strong> (<em>float</em><em>, </em><em>optional</em>) – The alpha regularization parameter for the ‘w’ matrix. Default is 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated ‘w’ matrix as calculated by the function’s rule.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>w_new (np.ndarray)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Note: The function does not currently enforce a constraint on the ‘beta’ parameter being between 0 and 1.</dt><dd><p>This should be considered when enhancing the function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_w_new_extended_alpha_beta_generic">
+<span class="sig-name descname"><span class="pre">_calculate_w_new_extended_alpha_beta_generic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularize_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_regularizer_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_sparse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_w_new_extended_alpha_beta_generic" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates a new ‘w’ matrix using a generic variant of an extended update rule that could be
+applied in algorithms such as Non-negative Matrix Factorization. The function supports both regular and sparse
+computations based on the provided input matrices and parameters.</p>
+<p>The function determines whether to use the sparse or regular computation based on the ‘is_sparse’ boolean flag.
+If ‘is_sparse’ is True, the ‘_calculate_w_new_extended_alpha_beta_sparse’ method is invoked, and if it’s False,
+the ‘_calculate_w_new_extended_alpha_beta’ method is called. Both methods are expected to take the same
+arguments as this function.</p>
+<p>Please note, the methods ‘_calculate_w_new_extended_alpha_beta_sparse’ and
+‘_calculate_w_new_extended_alpha_beta’ are not included in this function and need to be implemented separately.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>Any</em>) – The ‘x’ matrix in the current context. It should be numeric and compatible with ‘x_hat’ for
+division.</p></li>
+<li><p><strong>x_hat</strong> (<em>Any</em>) – The ‘x_hat’ matrix as calculated in the current context. It should be numeric and
+compatible with ‘x’ for division.</p></li>
+<li><p><strong>w</strong> (<em>Any</em>) – The initial ‘w’ matrix. It should be numeric.</p></li>
+<li><p><strong>h</strong> (<em>Any</em>) – The ‘h’ matrix in the current context. It should be numeric.
+beta (float): The beta regularization parameter for the update rule.</p></li>
+<li><p><strong>z</strong> (<em>Any</em>) – The ‘z’ matrix in the current context. It should be numeric and compatible with ‘z_hat’ for
+division.</p></li>
+<li><p><strong>z_hat</strong> (<em>Any</em>) – The ‘z_hat’ matrix as calculated in the current context. It should be numeric and
+compatible with ‘z’ for division.</p></li>
+<li><p><strong>b</strong> (<em>Any</em>) – The ‘b’ matrix in the current context. It should be numeric.</p></li>
+<li><p><strong>regularize_w</strong> (<em>Any</em>) – The regularization parameter for the ‘w’ matrix.</p></li>
+<li><p><strong>alpha_regularizer_w</strong> (<em>float</em><em>, </em><em>optional</em>) – The alpha regularization parameter for the ‘w’ matrix. Default is 0.</p></li>
+<li><p><strong>is_sparse</strong> (<em>bool</em><em>, </em><em>optional</em>) – A flag to determine whether to perform the sparse or regular computation.
+Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated ‘w’ matrix as calculated by the selected method.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>w_new (np.ndarray)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Note: The methods ‘_calculate_w_new_extended_alpha_beta_sparse’ and ‘_calculate_w_new_extended_alpha_beta’ need</dt><dd><p>to be implemented separately.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_w_new_extended_alpha_beta_sparse">
+<span class="sig-name descname"><span class="pre">_calculate_w_new_extended_alpha_beta_sparse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularize_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_regularizer_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_w_new_extended_alpha_beta_sparse" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates a new ‘w’ matrix using a comprehensive extended update rule designed for sparse
+matrices. The rule involves complex computations based on the input matrices, regularization parameters, and
+an optional sparsity constraint.</p>
+<p>This function performs the same calculations as <cite>_calculate_w_new_extended_alpha_beta</cite> but specifically handles
+sparse input matrices ‘x’ and ‘z’. If these inputs are not in the Compressed Sparse Row (csr_matrix) format,
+they are converted to it. The function then checks if each computed term is a non-NaN number before including
+it in the sum for the numerator or denominator of the complex fraction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.ndarray</em><em> or </em><em>csr_matrix</em>) – The ‘x’ matrix in the current context. It should be numeric and compatible
+with ‘x_hat’ for division.</p></li>
+<li><p><strong>x_hat</strong> (<em>np.ndarray</em>) – The ‘x_hat’ matrix as calculated in the current context. It should be numeric and
+compatible with ‘x’ for division.</p></li>
+<li><p><strong>w</strong> (<em>np.ndarray</em>) – The initial ‘w’ matrix. It should be numeric.</p></li>
+<li><p><strong>h</strong> (<em>np.ndarray</em>) – The ‘h’ matrix in the current context. It should be numeric.</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – The beta regularization parameter for the update rule.</p></li>
+<li><p><strong>z</strong> (<em>np.ndarray</em><em> or </em><em>csr_matrix</em>) – The ‘z’ matrix in the current context. It should be numeric and compatible
+with ‘z_hat’ for division.</p></li>
+<li><p><strong>z_hat</strong> (<em>np.ndarray</em>) – The ‘z_hat’ matrix as calculated in the current context. It should be numeric and
+compatible with ‘z’ for division.</p></li>
+<li><p><strong>b</strong> (<em>np.ndarray</em>) – The ‘b’ matrix in the current context. It should be numeric.</p></li>
+<li><p><strong>regularize_w</strong> (<em>float</em>) – The regularization parameter for the ‘w’ matrix.</p></li>
+<li><p><strong>alpha_regularizer_w</strong> (<em>float</em><em>, </em><em>optional</em>) – The alpha regularization parameter for the ‘w’ matrix. Default is 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated ‘w’ matrix as calculated by the function’s rule.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>w_new (np.ndarray)</p>
+</dd>
+</dl>
+<p>Note:
+- The function does not currently enforce a constraint on the ‘beta’ parameter being between 0 and 1. This
+should be considered when enhancing the function.
+- There is a potential issue with applying the <cite>_regularize_w</cite> function to sparse data, which may need to be
+resolved.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_x_hat">
+<span class="sig-name descname"><span class="pre">_calculate_x_hat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_x_hat" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the matrix product of the input matrices ‘w’ and ‘h’.</p>
+<p>The operation performed is a dot product (matrix multiplication), where the product of ‘w’ and ‘h’ results
+in a new matrix ‘x_hat’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w</strong> (<em>pd.DataFrame</em><em> or </em><em>np.ndarray</em>) – First input matrix. It should be numeric and compatible for multiplication
+with ‘h’.</p></li>
+<li><p><strong>h</strong> (<em>pd.DataFrame</em><em> or </em><em>np.ndarray</em>) – Second input matrix. It should be numeric and compatible for multiplication</p></li>
+<li><p><strong>'w'.</strong> (<em>with</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The product matrix resulting from the dot product of ‘w’ and ‘h’.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>x_hat (pd.DataFrame or np.ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_x_hat_extended">
+<span class="sig-name descname"><span class="pre">_calculate_x_hat_extended</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_x_hat_extended" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the matrix product of the input matrices ‘w’ and ‘h’ using explicit loops instead
+of direct matrix multiplication. The main idea was to create it in the more basic form to be sure that results
+are correct. After make sure that everything is correct, an optimization will be generated.</p>
+<p>The function first initializes an all-zeros matrix ‘x_hat’ of size (rows of ‘w’ x columns of ‘h’).
+It then iterates through each element of ‘x_hat’, and for each, computes the dot product of the corresponding
+row of ‘w’ and column of ‘h’, which is then assigned to the respective element in ‘x_hat’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w</strong> (<em>np.ndarray</em>) – First input matrix. It should be numeric and its number of columns should match the number</p></li>
+<li><p><strong>'h'.</strong> (<em>of rows in</em>) – </p></li>
+<li><p><strong>h</strong> (<em>np.ndarray</em>) – Second input matrix. It should be numeric and its number of rows should match the number of</p></li>
+<li><p><strong>'w'.</strong> (<em>columns in</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The product matrix resulting from the explicit calculation of the matrix multiplication
+of ‘w’ and ‘h’.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>x_hat (np.ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_y_hat">
+<span class="sig-name descname"><span class="pre">_calculate_y_hat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_y_hat" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the matrix product of the input matrices ‘a’ and ‘h’.</p>
+<p>The operation performed is a dot product (matrix multiplication), where the product of ‘a’ and ‘h’ results
+in a new matrix ‘y_hat’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>pd.DataFrame</em><em> or </em><em>np.ndarray</em>) – First input matrix. It should be numeric and compatible for multiplication</p></li>
+<li><p><strong>'h'.</strong> (<em>with</em>) – </p></li>
+<li><p><strong>h</strong> (<em>pd.DataFrame</em><em> or </em><em>np.ndarray</em>) – Second input matrix. It should be numeric and compatible for multiplication</p></li>
+<li><p><strong>'a'.</strong> (<em>with</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The product matrix resulting from the dot product of ‘a’ and ‘h’.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>y_hat (pd.DataFrame or np.ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._calculate_z_hat">
+<span class="sig-name descname"><span class="pre">_calculate_z_hat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._calculate_z_hat" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the matrix product of the input matrices ‘w’ and ‘b’.</p>
+<p>The operation performed is a dot product (matrix multiplication), where the product of ‘w’ and ‘b’ results
+in a new matrix ‘z_hat’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w</strong> (<em>pd.DataFrame</em><em> or </em><em>np.ndarray</em>) – First input matrix. It should be numeric and compatible for multiplication</p></li>
+<li><p><strong>'b'.</strong> (<em>with</em>) – </p></li>
+<li><p><strong>b</strong> (<em>pd.DataFrame</em><em> or </em><em>np.ndarray</em>) – Second input matrix. It should be numeric and compatible for multiplication</p></li>
+<li><p><strong>'w'.</strong> (<em>with</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The product matrix resulting from the dot product of ‘w’ and ‘b’.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>z_hat (pd.DataFrame or np.ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._check_parameters">
+<span class="sig-name descname"><span class="pre">_check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_limit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proportion_constraint_h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularize_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_regularizer_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialized_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialized_h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialized_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialized_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_method_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_method_h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_method_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_method_b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._check_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the parameters provided to ensure they meet the necessary constraints, and raises an exception if any
+constraints are violated. This function checks parameters for several matrices and factors related to
+Non-negative Matrix Factorization (NMF), as well as other parameters associated with the optimization model and
+stopping criteria.</p>
+<p>Parameters:</p>
+<dl class="simple">
+<dt>x_matrix, y_matrix, z_matrix<span class="classifier">array-like</span></dt><dd><p>The matrices for which to check the constraints. These matrices will be converted to numpy arrays for the
+purpose of validation.</p>
+</dd>
+<dt>k<span class="classifier">int</span></dt><dd><p>The number of latent components.</p>
+</dd>
+<dt>alpha, beta<span class="classifier">float</span></dt><dd><p>The alpha and beta values for the optimization model.</p>
+</dd>
+<dt>delta_threshold<span class="classifier">float</span></dt><dd><p>The threshold for the stopping criteria.</p>
+</dd>
+<dt>max_iterations<span class="classifier">int</span></dt><dd><p>The maximum number of iterations for the optimization.</p>
+</dd>
+<dt>print_limit<span class="classifier">int</span></dt><dd><p>The number of iterations between each print.</p>
+</dd>
+<dt>proportion_constraint_h<span class="classifier">bool</span></dt><dd><p>The proportion constraint for the H matrix.</p>
+</dd>
+<dt>regularize_w<span class="classifier">bool, optional</span></dt><dd><p>Whether to apply regularization on W matrix. Default is None.</p>
+</dd>
+<dt>alpha_regularizer_w<span class="classifier">float, optional</span></dt><dd><p>Alpha regularizer value. Default is 0.</p>
+</dd>
+<dt>fixed_w, fixed_h, fixed_a, fixed_b<span class="classifier">array-like, optional</span></dt><dd><p>Fixed matrices. If None, it implies that the matrix is not fixed. Default is None.</p>
+</dd>
+<dt>initialized_w, initialized_h, initialized_a, initialized_b<span class="classifier">array-like, optional</span></dt><dd><p>Initialized matrices. If None, it implies that the matrix is not initialized. Default is None.</p>
+</dd>
+<dt>init_method_w, init_method_h, init_method_a, init_method_b<span class="classifier">str</span></dt><dd><p>Methods for initializing the matrices. Allowed methods include ‘random_based.uniform’,
+‘random_based.power’, ‘nndsvd’, ‘nndsvda’, ‘nndsvdar’.</p>
+</dd>
+</dl>
+<p>Raises:
+ValueError
+If any parameters fail to meet the necessary constraints.</p>
+<p>Returns:
+None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._initialize_matrix">
+<span class="sig-name descname"><span class="pre">_initialize_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialized_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random_based.uniform'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._initialize_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function initializes a non-negative matrix of given size using several methods. This is a crucial step for
+Non-negative Matrix Factorization (NMF) algorithms since the choice of initialization can impact the
+algorithm’s speed and ability to find the global optimum.These approaches are inspired by
+several sources including the scikit-learn library and the reference by C. Boutsidis and E. Gallopoulos on
+“Non-negative Double Singular Value Decomposition (NNDSVD) based initialization: A head start for nonnegative
+matrix factorization”, Pattern Recognition, 2008 (<a class="reference external" href="http://tinyurl.com/nndsvd">http://tinyurl.com/nndsvd</a>).</p>
+<p>Different methods are implemented including:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Uniform random initialization, ‘random_based.uniform’: generates a matrix populated with random samples from a</dt><dd><p>uniform distribution over the interval [0, 1).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Power distribution random initialization, ‘random_based.power’: generates a matrix with samples drawn from a</dt><dd><p>power distribution with positive exponent a - 1, where ‘a’ is equivalent to the number of rows in the
+matrix.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Non-negative Double Singular Value Decomposition (NNDSVD), ‘nndsvd’, ‘nndsvda’ and ‘nndsvdar’: these methods</dt><dd><p>are described in the reference below and they are particularly good when the factorized matrix is sparse,
+however, these are currently marked as TODO and not implemented in this function.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Available methods for matrix initialization include:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>‘random_based.uniform’: Generates a matrix populated with random samples from a uniform distribution over the</dt><dd><p>interval [0, 1). scaled with: sqrt(X.mean() / n_components)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘random_based.power’: Generates a matrix with samples drawn from a power distribution with positive exponent</dt><dd><p>a - 1, where ‘a’ is equivalent to the number of rows in the matrix.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘nndsvd’: This method applies Nonnegative Double Singular Value Decomposition for initialization which is</dt><dd><p>beneficial for sparse matrices (currently not implemented).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘nndsvda’: Similar to ‘nndsvd’ but fills zero entries with the average of the matrix, preferred when sparsity</dt><dd><p>is not desired (currently not implemented).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘nndsvdar’: Like ‘nndsvda’ but fills zeros with small random values for a faster but less accurate alternative</dt><dd><p>(currently not implemented).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘None’: If no method is specified or if the chosen method is not recognized, a simple uniform random</dt><dd><p>initialization is performed by default. ‘nndsvda’ if n_components &lt;= min(n_samples, n_features), otherwise ‘random’</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Parameters:</p>
+<dl class="simple">
+<dt>size_rows<span class="classifier">int</span></dt><dd><p>Number of rows for the initialized matrix.</p>
+</dd>
+<dt>size_columns<span class="classifier">int</span></dt><dd><p>Number of columns for the initialized matrix.</p>
+</dd>
+<dt>initialized_matrix<span class="classifier">array-like, optional</span></dt><dd><p>If provided, this matrix is used as the initial matrix.</p>
+</dd>
+<dt>method<span class="classifier">str, optional</span></dt><dd><p>Method to use for initialization. Default is ‘random_based.uniform’.</p>
+</dd>
+</dl>
+<p>Returns:</p>
+<dl class="simple">
+<dt>new_matrix<span class="classifier">array-like</span></dt><dd><p>The initialized matrix.</p>
+</dd>
+</dl>
+<p>References:
+- C. Boutsidis, E. Gallopoulos: SVD based initialization: A head start for non-negative matrix factorization -
+Pattern Recognition, 2008. <a class="reference external" href="http://tinyurl.com/nndsvd">http://tinyurl.com/nndsvd</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._proportion_constraint_h">
+<span class="sig-name descname"><span class="pre">_proportion_constraint_h</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._proportion_constraint_h" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the proportion of each element in the input matrix ‘h’ along the columns.
+Each value in ‘h’ is divided by the sum of its corresponding column, generating a new matrix where the sum of
+each column is equal to 1. This results in a proportional distribution of the column’s values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>h</strong> (<em>pd.DataFrame</em><em> or </em><em>np.ndarray</em>) – Input matrix. Elements should be numeric.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Proportional matrix derived from ‘h’, where each value is a</dt><dd><p>proportion of the total sum of its column.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>h_proportions (pd.DataFrame or np.ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._regularize_w">
+<span class="sig-name descname"><span class="pre">_regularize_w</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularization_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._regularize_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function applies a specified normalization to the ‘w’ matrix. It aims to normalize each column of ‘w’
+so that the values fall within the range [0, 1]. The normalization type is flexible and can be specified by
+the ‘regularization_type’ parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w</strong> (<em>np.ndarray</em>) – The ‘w’ matrix that needs to be normalized. It should be numeric.</p></li>
+<li><p><strong>regularization_type</strong> (<em>str</em>) – Specifies the type of normalization to be applied. It should match one of the</p></li>
+<li><p><strong>function.</strong> (<em>supported types in the 'normalization'</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The normalized ‘w’ matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>regularized_w (np.ndarray)</p>
+</dd>
+</dl>
+<p>Note: The normalization is performed by the ‘normalization’ function (not included in this docstring), so the
+normalization options and the behavior of this function depends on the ‘normalization’ function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex._standardize_sparse_matrix">
+<span class="sig-name descname"><span class="pre">_standardize_sparse_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex._standardize_sparse_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standardizes a sparse matrix by replacing empty strings, “null”, “na”, and “NA” values with numpy’s nan, and
+converts the matrix to a float type. The original index and column names are retained.</p>
+<p>Parameters:
+matrix : array-like
+The sparse matrix to be standardized. The matrix is converted to a numpy array for processing.</p>
+<p>Returns:
+standardized_matrix_df : DataFrame
+The standardized matrix, returned as a pandas DataFrame. All replaced values are represented as np.nan,
+and all data is converted to float type.</p>
+<p>Raises:
+TypeError
+If the input matrix cannot be converted to float.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex.check_fixed_matrices_gamma_alpha_beta">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_fixed_matrices_gamma_alpha_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fixed_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex.check_fixed_matrices_gamma_alpha_beta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modifies gamma, alpha, and beta based on the given fixed matrices to prevent unnecessary divergence
+calculations. If all parameters become zero, a ValueError is raised to prevent model execution.</p>
+<p>Parameters:
+fixed_w : array-like or None
+Fixed matrix W. If None, it implies that W is not fixed.</p>
+<dl class="simple">
+<dt>fixed_h<span class="classifier">array-like or None</span></dt><dd><p>Fixed matrix H. If None, it implies that H is not fixed.</p>
+</dd>
+<dt>fixed_a<span class="classifier">array-like or None</span></dt><dd><p>Fixed matrix A. If None, it implies that A is not fixed.</p>
+</dd>
+<dt>fixed_b<span class="classifier">array-like or None</span></dt><dd><p>Fixed matrix B. If None, it implies that B is not fixed.</p>
+</dd>
+<dt>gamma<span class="classifier">float</span></dt><dd><p>A scalar weighting the divergence of X and WH in the loss function.</p>
+</dd>
+<dt>alpha<span class="classifier">float</span></dt><dd><p>A scalar weighting the divergence of Y and AH in the loss function.</p>
+</dd>
+<dt>beta<span class="classifier">float</span></dt><dd><p>A scalar weighting the divergence of Z and WB in the loss function.</p>
+</dd>
+</dl>
+<p>Returns:
+gamma : float
+Possibly modified gamma value. It’s set to 0 if W and H are both fixed.</p>
+<dl class="simple">
+<dt>alpha<span class="classifier">float</span></dt><dd><p>Possibly modified alpha value. It’s set to 0 if A and H are both fixed.</p>
+</dd>
+<dt>beta<span class="classifier">float</span></dt><dd><p>Possibly modified beta value. It’s set to 0 if W and B are both fixed.</p>
+</dd>
+</dl>
+<p>Raises:
+ValueError
+If gamma, alpha, and beta are all 0, indicating that the model cannot be executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex.normalization">
+<span class="sig-name descname"><span class="pre">normalization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalization_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex.normalization" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function normalizes the provided matrix based on a specified normalization type. It supports various types
+of normalization, including column_max, global_max, centered, norm_zero_min_max, centered_norm_zero_min_max,
+quantile_norm, quantile_norm_min_max, and quantile_transform.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>matrix</strong> (<em>np.ndarray</em>) – The input matrix that needs to be normalized. It should be numeric.</p></li>
+<li><p><strong>normalization_type</strong> (<em>str</em>) – Specifies the type of normalization to be applied. Supported types include
+‘column_max’, ‘global_max’, ‘centered’, ‘norm_zero_min_max’, ‘centered_norm_zero_min_max’,
+‘quantile_norm’, ‘quantile_norm_min_max’, and ‘quantile_transform’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The normalized version of the input matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>normalized_matrix (np.ndarray)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Supported Normalization Types:</dt><dd><ul class="simple">
+<li><p>‘column_max’: Each value in a column is divided by the maximum value of that column.</p></li>
+<li><p>‘global_max’: Each value in the matrix is divided by the maximum value of the entire matrix.</p></li>
+<li><p>‘centered’: The mean is subtracted from each value, and then divided by the standard deviation.</p></li>
+<li><dl class="simple">
+<dt>‘norm_zero_min_max’: Each value is subtracted by the minimum value of the matrix, and then divided by the</dt><dd><p>range (max - min) of the matrix.</p>
+</dd>
+</dl>
+</li>
+<li><p>‘centered_norm_zero_min_max’: The matrix is first centered, then normalized between 0 and 1.</p></li>
+<li><dl class="simple">
+<dt>‘quantile_norm’: Quantile normalization is applied to the matrix (see ‘quantile_normalize_v2’ function</dt><dd><p>for details).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘quantile_norm_min_max’: The matrix is first transformed using a quantile transform, then normalized</dt><dd><p>between 0 and 1.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘quantile_transform’: A quantile transform is applied to the matrix with n_quantiles=4. Random state is</dt><dd><p>fixed to 0.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>Note: The actual implementation of ‘quantile_normalize_v2’ and ‘quantile_transform’ is not included in this
+docstring. It depends on the implementation of these functions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex.quantile_normalize">
+<span class="sig-name descname"><span class="pre">quantile_normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex.quantile_normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function applies quantile normalization to a given matrix. The implementation is adapted from the code
+available at <a class="reference external" href="https://github.com/ShawnLYU/Quantile_Normalize">https://github.com/ShawnLYU/Quantile_Normalize</a> and <a class="reference external" href="https://stackoverflow.com/questions/37935920/">https://stackoverflow.com/questions/37935920/</a>
+quantile-normalization-on-pandas-dataframe. The input matrix can be either a numpy ndarray or a pandas
+DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>matrix</strong> (<em>np.ndarray</em><em> or </em><em>pd.DataFrame</em>) – The input matrix that needs to be quantile normalized. The matrix</p></li>
+<li><p><strong>numeric.</strong> (<em>should be</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The quantile normalized version of the input matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>df (pd.DataFrame)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Procedure:</dt><dd><ol class="arabic simple">
+<li><p>Converts the input matrix into a pandas DataFrame if it isn’t one already.</p></li>
+<li><p>Creates a copy of the input DataFrame to avoid modifying the original data.</p></li>
+<li><p>Computes the rank (average of each row when sorted by columns) of the DataFrame.</p></li>
+<li><dl class="simple">
+<dt>For each column, sorts the column, matches the original values with their rank, and replaces the</dt><dd><p>original values with the corresponding rank values. This results in columns having the same
+distribution.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The quantile normalization procedure is often used in bioinformatics and statistics to make the
+distribution of values in different columns (usually representing different samples) the same, or quantiles
+the same. This is particularly useful when different columns have different scales or distribution of
+values, and we want to make them comparable across columns.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex.quantile_normalize_v2">
+<span class="sig-name descname"><span class="pre">quantile_normalize_v2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex.quantile_normalize_v2" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function implements a version of quantile normalization on a given matrix. The code is adapted from
+<a class="reference external" href="https://cmdlinetips.com/2020/06/computing-quantile-normalization-in-python/">https://cmdlinetips.com/2020/06/computing-quantile-normalization-in-python/</a>. The input matrix can be either a
+numpy ndarray or a pandas DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>matrix</strong> (<em>np.ndarray</em><em> or </em><em>pd.DataFrame</em>) – The input matrix to be quantile normalized. The matrix should be</p></li>
+<li><p><strong>numeric.</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The quantile normalized version of the input matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>df_qn (pd.DataFrame)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Procedure:</dt><dd><ol class="arabic simple">
+<li><p>Converts the input matrix into a pandas DataFrame if it isn’t one already.</p></li>
+<li><p>Sorts the values of the DataFrame along each column, creating a new DataFrame.</p></li>
+<li><p>Calculates the mean of each row in the sorted DataFrame and assigns it to a new pandas Series, df_mean.</p></li>
+<li><dl class="simple">
+<dt>Ranks each value in the original DataFrame, and replaces each rank with the corresponding mean value</dt><dd><p>from df_mean.</p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Quantile normalization is a technique often used in bioinformatics and statistics to make the distribution
+of values in different columns (usually representing different samples) the same, or quantiles the same.
+This is particularly useful when different columns have different scales or distribution of values, and we
+want to make them comparable across columns.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex.run_deconvolution">
+<span class="sig-name descname"><span class="pre">run_deconvolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex.run_deconvolution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run deconvolution on the input matrix using a basic decomposition setup.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_matrix</strong> (<em>numpy.ndarray</em>) – The input matrix to be deconvoluted.</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – Number of k components or ranks</p></li>
+<li><p><strong>delta_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – The convergence threshold for stopping the deconvolution iterations.</p></li>
+<li><p><strong>0.005.</strong> (<em>Default is</em>) – </p></li>
+<li><p><strong>max_iterations</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of iterations to perform during deconvolution.</p></li>
+<li><p><strong>200.</strong> (<em>Default is</em>) – </p></li>
+<li><p><strong>print_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – The iteration interval at which to print progress messages during</p></li>
+<li><p><strong>deconvolution.</strong> – </p></li>
+<li><p><strong>100.</strong> (<em>Default is</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The deconvoluted matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#NMMFlex.NMMFlex" title="NMMFlex.NMMFlex">NMMFlex</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the input matrix <cite>x_matrix</cite>.</p></li>
+<li><p><strong>ValueError</strong> – If the shape of the input matrix <cite>x_matrix</cite> is not compatible with the Rank <cite>k</cite>.</p></li>
+<li><p><strong>ValueError</strong> – If <cite>delta_threshold</cite> is not a positive float.</p></li>
+<li><p><strong>ValueError</strong> – If <cite>max_iterations</cite> is not a positive integer.</p></li>
+<li><p><strong>ValueError</strong> – If <cite>print_limit</cite> is not a positive integer.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>The input matrix <cite>x_matrix</cite> and the rank <cite>k</cite> should have compatible shapes for deconvolution to work</dt><dd><p>properly.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The <cite>delta_threshold</cite> specifies the convergence threshold for stopping the iterations. Smaller values</dt><dd><p>result  in higher precision but may require more iterations.</p>
+</dd>
+</dl>
+</li>
+<li><p>The <cite>max_iterations</cite> parameter limits the number of iterations to prevent infinite loops.</p></li>
+<li><dl class="simple">
+<dt>The <cite>print_limit</cite> parameter controls the interval at which progress messages are printed during</dt><dd><p>the deconvolution.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version Use: </span>the function run_deconvolution_multiple with delta_threshold and beta parameters set to zero.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex.run_deconvolution_multiple">
+<span class="sig-name descname"><span class="pre">run_deconvolution_multiple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proportion_constraint_h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularize_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_regularizer_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialized_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialized_h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialized_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialized_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_method_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random_based.uniform'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_method_h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random_based.uniform'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_method_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random_based.uniform'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_method_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'random_based.uniform'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex.run_deconvolution_multiple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that runs the NMMFlex with three matrices as input. You can define if the model is complete or
+partial in terms of the input and therefore the output. For example, if some matrices are fixed (e.g., WH),
+and Y is provided, then the variable Gamma = 0, resulting in Divergence(X|WG) being zero, while the rest can
+still be calculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_matrix</strong> (<em>numpy.ndarray</em>) – Input matrix corresponding to a dataframe.</p></li>
+<li><p><strong>y_matrix</strong> (<em>numpy.ndarray</em><em>, </em><em>optional</em>) – Input matrix.</p></li>
+<li><p><strong>z_matrix</strong> (<em>numpy.ndarray</em><em>, </em><em>optional</em>) – Input matrix.</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – The rank used for deconvolution.</p></li>
+<li><p><strong>gamma</strong> (<em>float</em><em>, </em><em>optional</em>) – The gamma parameter value. Default is 1.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – The alpha parameter value. Default is 0.0.</p></li>
+<li><p><strong>beta</strong> (<em>float</em><em>, </em><em>optional</em>) – The beta parameter value. Default is 0.0.</p></li>
+<li><p><strong>delta_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – The convergence threshold for stopping the deconvolution iterations.</p></li>
+<li><p><strong>1e-10.</strong> (<em>Default is</em>) – </p></li>
+<li><p><strong>max_iterations</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of iterations to perform during deconvolution.</p></li>
+<li><p><strong>200.</strong> (<em>Default is</em>) – </p></li>
+<li><p><strong>print_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – The iteration interval at which to print progress messages during deconvolution</p></li>
+<li><p><strong>100.</strong> (<em>Default is</em>) – </p></li>
+<li><p><strong>proportion_constraint_h</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to apply a proportion constraint to matrix H.</p></li>
+<li><p><strong>True.</strong> (<em>Default is</em>) – </p></li>
+<li><p><strong>regularize_w</strong> (<em>numpy.ndarray</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The regularization matrix for W. Default is None.</p></li>
+<li><p><strong>alpha_regularizer_w</strong> (<em>float</em><em>, </em><em>optional</em>) – The alpha regularization parameter for W. Default is 0.</p></li>
+<li><p><strong>fixed_w</strong> (<em>numpy.ndarray</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The fixed matrix for W. Default is None.</p></li>
+<li><p><strong>fixed_h</strong> (<em>numpy.ndarray</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The fixed matrix for H. Default is None.</p></li>
+<li><p><strong>fixed_a</strong> (<em>numpy.ndarray</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The fixed matrix for A. Default is None.</p></li>
+<li><p><strong>fixed_b</strong> (<em>numpy.ndarray</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The fixed matrix for B. Default is None.</p></li>
+<li><p><strong>initialized_w</strong> (<em>numpy.ndarray</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The initial value for W. Default is None.</p></li>
+<li><p><strong>initialized_h</strong> (<em>numpy.ndarray</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The initial value for H. Default is None.</p></li>
+<li><p><strong>initialized_a</strong> (<em>numpy.ndarray</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The initial value for A. Default is None.</p></li>
+<li><p><strong>initialized_b</strong> (<em>numpy.ndarray</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The initial value for B. Default is None.</p></li>
+<li><p><strong>init_method_w</strong> (<em>str</em><em>, </em><em>optional</em>) – The initialization method for W. Default is ‘random_based.uniform’.</p></li>
+<li><p><strong>init_method_h</strong> (<em>str</em><em>, </em><em>optional</em>) – The initialization method for H. Default is ‘random_based.uniform’.</p></li>
+<li><p><strong>init_method_a</strong> (<em>str</em><em>, </em><em>optional</em>) – The initialization method for A. Default is ‘random_based.uniform’.</p></li>
+<li><p><strong>init_method_b</strong> (<em>str</em><em>, </em><em>optional</em>) – The initialization method for B. Default</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to display progress messages during deconvolution. Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The deconvoluted matrix.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If any of the input matrices.</p></li>
+<li><p><strong>ValueError</strong> – If the shape of the input matrices and the rank k is not compatible.</p></li>
+<li><p><strong>ValueError</strong> – If any of the parameter values are invalid or not in the expected range.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>The input matrices <cite>x_matrix</cite>, <cite>y_matrix</cite>, and <cite>z_matrix</cite> and the rank <cite>k</cite> should have compatible shapes</dt><dd><p>for deconvolution to work properly.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The <cite>gamma</cite>, <cite>alpha</cite>, and <cite>beta</cite> parameters control the balance between different parts of the</dt><dd><p>deconvolution process.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The <cite>delta_threshold</cite> specifies the convergence threshold for stopping the iterations. Smaller values</dt><dd><p>result in higher precision but may require more iterations.</p>
+</dd>
+</dl>
+</li>
+<li><p>The <cite>max_iterations</cite> parameter limits the number of iterations to prevent infinite loops.</p></li>
+<li><dl class="simple">
+<dt>The <cite>print_limit</cite> parameter controls the interval at which progress messages are printed during</dt><dd><p>deconvolution.</p>
+</dd>
+</dl>
+</li>
+<li><p>The <cite>proportion_constraint_h</cite> parameter determines whether to apply a proportion constraint to matrix H.</p></li>
+<li><p>The <cite>regularize_w</cite> and <cite>alpha_regularizer_w</cite> parameters are used for regularization of matrix W.</p></li>
+<li><dl class="simple">
+<dt>The <cite>fixed_w</cite>, <cite>fixed_h</cite>, <cite>fixed_a</cite>, and <cite>fixed_b</cite> parameters allow fixing specific matrices during</dt><dd><p>deconvolution.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The <cite>initialized_w</cite>, <cite>initialized_h</cite>, <cite>initialized_a</cite>, and <cite>initialized_b</cite> parameters allow</dt><dd><p>providing initial values for the corresponding matrices.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The <cite>init_method_w</cite>, <cite>init_method_h</cite>, <cite>init_method_a</cite>, and <cite>init_method_b</cite> parameters specify the</dt><dd><p>initialization method for the corresponding matrices.</p>
+</dd>
+</dl>
+</li>
+<li><p>The <cite>verbose</cite> parameter controls whether progress messages are displayed during deconvolution.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.NMMFlex.sparsity_calculation">
+<span class="sig-name descname"><span class="pre">sparsity_calculation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_analysis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zeros_and_nulls'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_return</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'index'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.NMMFlex.sparsity_calculation" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the degree of sparsity in a given matrix. A matrix’s sparsity is measured by the
+proportion of its cells that contain zero or NaN/null values. For example, a matrix with 10% of its cells filled
+with non-zero values has a density of 10% and hence, is 90% sparse.</p>
+<p>The function allows for different types of sparsity analysis:
+- ‘zeros_and_nulls’: considers both zero and NaN/null values when calculating sparsity,
+- ‘zeros’: considers only zero values, and
+- ‘nulls’: considers only NaN/null values.</p>
+<p>The sparsity measure can be returned in three forms:
+- ‘boolean’: returns ‘False’ if the matrix is not sparse (sparsity = 0) and ‘True’ otherwise,
+- ‘percentage’: returns the sparsity as a percentage of the total cells in the matrix, and
+- ‘index’: returns the sparsity as a float in the range of [0, 1].</p>
+<p>The function also supports verbose mode which, when enabled, prints additional information on the computed
+values.</p>
+<p>Parameters:
+matrix : array-like
+The matrix to analyze for sparsity. If not an ndarray, the matrix is converted to one.
+type_analysis : str, optional
+The type of analysis to conduct. It can be either ‘zeros_and_nulls’, ‘zeros’, or ‘nulls’. Default is
+‘zeros_and_nulls’.
+type_return : str, optional
+The type of value to return. It can be either ‘boolean’, ‘percentage’, or ‘index’. Default is ‘index’.
+verbose : bool, optional
+If ‘True’, the function prints additional information. Default is ‘False’.</p>
+<p>Returns:
+sparseness_return : bool or float
+The sparsity measure of the matrix. The type of the returned value depends on ‘type_return’.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="NMMFlex.grid_search_parallelized_async">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NMMFlex.</span></span><span class="sig-name descname"><span class="pre">grid_search_parallelized_async</span></span><a class="headerlink" href="#NMMFlex.grid_search_parallelized_async" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for parallelized grid search to optimize hyperparameters asynchronously.</p>
+<p>The class implements methods for conducting a grid search in an efficient way by
+leveraging the power of multiple CPUs. The grid search is executed asynchronously,
+which means that the search does not wait for all processes to finish before it continues,
+thereby potentially speeding up the execution time.</p>
+<dl class="simple">
+<dt>Key features include:</dt><dd><ul class="simple">
+<li><p>Asynchronous execution of grid search</p></li>
+<li><p>Utilization of multiple CPUs for faster processing</p></li>
+<li><p>Adaptability to various models and hyperparameters</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.grid_search_parallelized_async._calculate_pair_parameters">
+<span class="sig-name descname"><span class="pre">_calculate_pair_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.grid_search_parallelized_async._calculate_pair_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the combinations of two parameter lists, alpha and beta.</p>
+<p>Parameters:
+alpha_list : list
+A list of alpha values.</p>
+<dl class="simple">
+<dt>beta_list<span class="classifier">list</span></dt><dd><p>A list of beta values.</p>
+</dd>
+</dl>
+<p>Returns:
+alpha_beta_combinations : list of lists
+A list of [alpha, beta] pairs, where alpha is from alpha_list and beta is from beta_list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.grid_search_parallelized_async.grid_search_parallelized_alpha_beta">
+<span class="sig-name descname"><span class="pre">grid_search_parallelized_alpha_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bulk_data_methylation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk_data_expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_expression_auxiliary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proportion_constraint_h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularize_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_regularizer_w_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.grid_search_parallelized_async.grid_search_parallelized_alpha_beta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a grid search in a parallelized manner over different values of alpha and beta in the Non-negative
+matrix factorization. The search is conducted over the combinations of given alpha and beta values.</p>
+<p>Parameters:
+bulk_data_methylation : pd.DataFrame
+Bulk data methylation matrix.</p>
+<dl class="simple">
+<dt>bulk_data_expression<span class="classifier">pd.DataFrame</span></dt><dd><p>Bulk data expression matrix.</p>
+</dd>
+<dt>data_expression_auxiliary<span class="classifier">pd.DataFrame</span></dt><dd><p>Auxiliary expression data matrix.</p>
+</dd>
+<dt>k<span class="classifier">int</span></dt><dd><p>Number of clusters.</p>
+</dd>
+<dt>alpha_list<span class="classifier">list, optional</span></dt><dd><p>List of alpha values to be considered in the grid search. Default is None.</p>
+</dd>
+<dt>beta_list<span class="classifier">list, optional</span></dt><dd><p>List of beta values to be considered in the grid search. Default is None.</p>
+</dd>
+<dt>delta_threshold<span class="classifier">float, optional</span></dt><dd><p>The threshold value for convergence. Default is 1e-20.</p>
+</dd>
+<dt>max_iterations<span class="classifier">int, optional</span></dt><dd><p>Maximum number of iterations for convergence. Default is 200.</p>
+</dd>
+<dt>print_limit<span class="classifier">int, optional</span></dt><dd><p>Limit for print statements. Default is 100.</p>
+</dd>
+<dt>threads<span class="classifier">int, optional</span></dt><dd><p>Number of CPU threads to be used. If 0, then it uses the total number of CPUs minus one. Default is 0.</p>
+</dd>
+<dt>proportion_constraint_h<span class="classifier">bool, optional</span></dt><dd><p>Whether to apply proportion constraint on H matrix. Default is True.</p>
+</dd>
+<dt>regularize_w<span class="classifier">bool, optional</span></dt><dd><p>Whether to apply regularization on W matrix. Default is None.</p>
+</dd>
+<dt>alpha_regularizer_w_list<span class="classifier">list, optional</span></dt><dd><p>List of alpha regularizer values to be considered in the grid search. Default is None.</p>
+</dd>
+<dt>fixed_w<span class="classifier">array-like, optional</span></dt><dd><p>Fixed matrix W. If None, it implies that W is not fixed. Default is None.</p>
+</dd>
+<dt>fixed_h<span class="classifier">array-like, optional</span></dt><dd><p>Fixed matrix H. If None, it implies that H is not fixed. Default is None.</p>
+</dd>
+<dt>fixed_a<span class="classifier">array-like, optional</span></dt><dd><p>Fixed matrix A. If None, it implies that A is not fixed. Default is None.</p>
+</dd>
+<dt>fixed_b<span class="classifier">array-like, optional</span></dt><dd><p>Fixed matrix B. If None, it implies that B is not fixed. Default is None.</p>
+</dd>
+</dl>
+<p>Returns:
+result_objects : list
+List of AsyncResult objects representing the results of the grid search.</p>
+<dl class="simple">
+<dt>Raises<span class="classifier">ValueError</span></dt><dd><p>If gamma, alpha and beta are all 0, indicating that the model cannot be executed.
+If any two of gamma, alpha, beta are zero, it suggests that the user should switch to the more direct
+function run_deconvolution_multiple().</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="NMMFlex.grid_search_parallelized_async.run_deconvolution_async">
+<span class="sig-name descname"><span class="pre">run_deconvolution_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bulk_data_methylation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk_data_expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_expression_auxiliary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_limit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proportion_constraint_h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regularize_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_regularizer_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NMMFlex.grid_search_parallelized_async.run_deconvolution_async" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the deconvolution process for Non-negative Multiple Matrix Factorization (NMMF).
+The deconvolution process for Non-negative Multiple Matrix Factorization (NMMF) is executed in this
+implementation. It is specifically designed for the analysis of Omic data, such as methylation and
+expression data.</p>
+<p>Parameters:
+bulk_data_methylation : pd.DataFrame
+Bulk data methylation matrix.</p>
+<dl class="simple">
+<dt>bulk_data_expression<span class="classifier">pd.DataFrame</span></dt><dd><p>Bulk data expression matrix.</p>
+</dd>
+<dt>data_expression_auxiliary<span class="classifier">pd.DataFrame</span></dt><dd><p>Auxiliary expression data matrix.</p>
+</dd>
+<dt>k<span class="classifier">int</span></dt><dd><p>Number of clusters (Rank)</p>
+</dd>
+<dt>alpha<span class="classifier">float</span></dt><dd><p>Parameter alpha for the NMF model.</p>
+</dd>
+<dt>beta<span class="classifier">float</span></dt><dd><p>Parameter beta for the NMF model.</p>
+</dd>
+<dt>delta_threshold<span class="classifier">float</span></dt><dd><p>The threshold value for convergence.</p>
+</dd>
+<dt>max_iterations<span class="classifier">int</span></dt><dd><p>Maximum number of iterations for convergence.</p>
+</dd>
+<dt>print_limit<span class="classifier">int</span></dt><dd><p>Limit for print statements.</p>
+</dd>
+<dt>proportion_constraint_h<span class="classifier">bool</span></dt><dd><p>Whether to apply proportion constraint on H matrix.</p>
+</dd>
+<dt>regularize_w<span class="classifier">bool, optional</span></dt><dd><p>Whether to apply regularization on W matrix. Default is None.</p>
+</dd>
+<dt>alpha_regularizer_w<span class="classifier">float, optional</span></dt><dd><p>Alpha regularizer value. Default is 0.</p>
+</dd>
+<dt>fixed_w<span class="classifier">array-like, optional</span></dt><dd><p>Fixed matrix W. If None, it implies that W is not fixed. Default is None.</p>
+</dd>
+<dt>fixed_h<span class="classifier">array-like, optional</span></dt><dd><p>Fixed matrix H. If None, it implies that H is not fixed. Default is None.</p>
+</dd>
+<dt>fixed_a<span class="classifier">array-like, optional</span></dt><dd><p>Fixed matrix A. If None, it implies that A is not fixed. Default is None.</p>
+</dd>
+<dt>fixed_b<span class="classifier">array-like, optional</span></dt><dd><p>Fixed matrix B. If None, it implies that B is not fixed. Default is None.</p>
+</dd>
+</dl>
+<p>Returns:
+result : NMMFlex object
+NMMFlex object containing the results of the deconvolution process.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="id1">
+<h1>Indices and tables<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="#">
+              <img class="logo" src="_static/NMMFlexPy.png" alt="Logo"/>
+            </a></p>
+  <div>
+    <h3><a href="#">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Welcome to NMMFlex’s documentation!</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a><ul>
+<li><a class="reference internal" href="#module-NMMFlex">Public and internal functions</a><ul>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex"><code class="docutils literal notranslate"><span class="pre">NMMFlex</span></code></a><ul>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._analyse_sparsity_matrix"><code class="docutils literal notranslate"><span class="pre">NMMFlex._analyse_sparsity_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._assign_global_variables"><code class="docutils literal notranslate"><span class="pre">NMMFlex._assign_global_variables()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_a_new_extended"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_a_new_extended()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_a_new_extended_generic"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_a_new_extended_generic()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_a_new_extended_sparse"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_a_new_extended_sparse()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_b_new_extended"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_b_new_extended()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_b_new_extended_generic"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_b_new_extended_generic()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_b_new_extended_sparse"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_b_new_extended_sparse()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_divergence_extended"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_divergence_extended()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_divergence_generic"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_divergence_generic()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_divergence_sparse"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_divergence_sparse()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_h_new_extended"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_h_new_extended()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_h_new_extended_alpha_beta"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_h_new_extended_alpha_beta()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_h_new_extended_alpha_beta_generic"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_h_new_extended_alpha_beta_generic()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_h_new_extended_alpha_beta_sparse"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_h_new_extended_alpha_beta_sparse()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_k_values_labels"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_k_values_labels()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_w_new_extended"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_w_new_extended()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_w_new_extended_alpha_beta"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_w_new_extended_alpha_beta()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_w_new_extended_alpha_beta_generic"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_w_new_extended_alpha_beta_generic()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_w_new_extended_alpha_beta_sparse"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_w_new_extended_alpha_beta_sparse()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_x_hat"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_x_hat()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_x_hat_extended"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_x_hat_extended()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_y_hat"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_y_hat()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._calculate_z_hat"><code class="docutils literal notranslate"><span class="pre">NMMFlex._calculate_z_hat()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._check_parameters"><code class="docutils literal notranslate"><span class="pre">NMMFlex._check_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._initialize_matrix"><code class="docutils literal notranslate"><span class="pre">NMMFlex._initialize_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._proportion_constraint_h"><code class="docutils literal notranslate"><span class="pre">NMMFlex._proportion_constraint_h()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._regularize_w"><code class="docutils literal notranslate"><span class="pre">NMMFlex._regularize_w()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex._standardize_sparse_matrix"><code class="docutils literal notranslate"><span class="pre">NMMFlex._standardize_sparse_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex.check_fixed_matrices_gamma_alpha_beta"><code class="docutils literal notranslate"><span class="pre">NMMFlex.check_fixed_matrices_gamma_alpha_beta()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex.normalization"><code class="docutils literal notranslate"><span class="pre">NMMFlex.normalization()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex.quantile_normalize"><code class="docutils literal notranslate"><span class="pre">NMMFlex.quantile_normalize()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex.quantile_normalize_v2"><code class="docutils literal notranslate"><span class="pre">NMMFlex.quantile_normalize_v2()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex.run_deconvolution"><code class="docutils literal notranslate"><span class="pre">NMMFlex.run_deconvolution()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex.run_deconvolution_multiple"><code class="docutils literal notranslate"><span class="pre">NMMFlex.run_deconvolution_multiple()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.NMMFlex.sparsity_calculation"><code class="docutils literal notranslate"><span class="pre">NMMFlex.sparsity_calculation()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#NMMFlex.grid_search_parallelized_async"><code class="docutils literal notranslate"><span class="pre">grid_search_parallelized_async</span></code></a><ul>
+<li><a class="reference internal" href="#NMMFlex.grid_search_parallelized_async._calculate_pair_parameters"><code class="docutils literal notranslate"><span class="pre">grid_search_parallelized_async._calculate_pair_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.grid_search_parallelized_async.grid_search_parallelized_alpha_beta"><code class="docutils literal notranslate"><span class="pre">grid_search_parallelized_async.grid_search_parallelized_alpha_beta()</span></code></a></li>
+<li><a class="reference internal" href="#NMMFlex.grid_search_parallelized_async.run_deconvolution_async"><code class="docutils literal notranslate"><span class="pre">grid_search_parallelized_async.run_deconvolution_async()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id1">Indices and tables</a></li>
+</ul>
+
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">NMMFlex 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to NMMFlex’s documentation!</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Crhistian Cardona.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    </div>
+  </body>
+</html>
