@@ -27,7 +27,7 @@ Indices and tables
 Public and internal functions
 ####################################
 .. automodule:: NMMFlex
-   :members:
+   :members: factorization, grid_search
    :private-members:
 
 

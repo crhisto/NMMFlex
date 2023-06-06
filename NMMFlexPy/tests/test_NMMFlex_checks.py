@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from NMMFlex.NMMFlex import NMMFlex
+from src.NMMFlex.factorization import factorization
 
 
 # It's true that we shouldn't create unit tests based on specific strings, but
@@ -11,13 +11,13 @@ from NMMFlex.NMMFlex import NMMFlex
 class test_NMMFlex_checks(unittest.TestCase):
     """
     The test_NMMFlex_checks class is a TestCase subclass for testing the
-    NMMFlex checks.
+    src checks.
 
     Attributes:
-    dec (NMMFlex): The NMMFlex instance to be used for testing.
+    dec (src): The src instance to be used for testing.
 
     Methods:
-    setUp: Sets up a NMMFlex instance before each tests.
+    setUp: Sets up a src instance before each tests.
     tearDown: Cleans up after each tests.
 
     Notes:
@@ -28,13 +28,13 @@ class test_NMMFlex_checks(unittest.TestCase):
     TestCase class to check for various conditions.
     - The setUp method is run before each individual tests, and the tearDown
     method is run after each tests.
-    - The dec attribute holds an instance of the NMMFlex class that can be
+    - The dec attribute holds an instance of the src class that can be
     used in each tests.
     """
 
     # This function will be called for each test.
     def setUp(self):
-        self.dec = NMMFlex()
+        self.dec = factorization()
 
     def tearDown(self):
         del self.dec

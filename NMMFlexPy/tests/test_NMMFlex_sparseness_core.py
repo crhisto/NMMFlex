@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
 
-from NMMFlex.NMMFlex import NMMFlex
+from src.NMMFlex.factorization import factorization
 
 
 class test_NMMFlex_sparseness_core(unittest.TestCase):
@@ -23,7 +23,7 @@ class test_NMMFlex_sparseness_core(unittest.TestCase):
     h_sparse = None
 
     def setUp(self):
-        self.dec = NMMFlex()
+        self.dec = factorization()
         self._create_sparce_matrix_setup()
 
     def tearDown(self):

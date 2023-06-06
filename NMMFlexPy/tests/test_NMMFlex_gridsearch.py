@@ -5,7 +5,7 @@ import numpy
 import numpy as np
 import pandas as pd
 
-from NMMFlex.NMMFlex import grid_search_parallelized_async
+from src.NMMFlex.grid_search import grid_search
 
 
 class test_NMMFlex_gridsearch(unittest.TestCase):
@@ -31,7 +31,7 @@ class test_NMMFlex_gridsearch(unittest.TestCase):
     def setUp(self):
         # Let's import the data
         self._import_test_data()
-        self.grid_search_deco = grid_search_parallelized_async()
+        self.grid_search_deco = grid_search()
 
     def tearDown(self):
         del self.bulk_methylation_matrix

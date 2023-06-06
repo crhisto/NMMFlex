@@ -4,7 +4,7 @@ import numpy.testing
 import pandas as pd
 import pytest
 
-from NMMFlex.NMMFlex import NMMFlex
+from src.NMMFlex.factorization import factorization
 
 
 class test_NMMFlex_sparseness_deconvolution(unittest.TestCase):
@@ -18,7 +18,7 @@ class test_NMMFlex_sparseness_deconvolution(unittest.TestCase):
     def setUp(self):
         # Let's import the data
         self._import_test_data()
-        self.dec = NMMFlex()
+        self.dec = factorization()
 
     def tearDown(self):
         del self.bulk_methylation_matrix

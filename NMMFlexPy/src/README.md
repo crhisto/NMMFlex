@@ -36,7 +36,7 @@ NMMFlexPy requires the following dependencies, which will be installed automatic
 Once installed, you can import and use the NMMFlexPy package in your Python code:
 
 ```python
-import NMMFlex
+from NMMFlex import factorization, grid_search
 
 # Use the functionalities provided by NMMFlex
 ```

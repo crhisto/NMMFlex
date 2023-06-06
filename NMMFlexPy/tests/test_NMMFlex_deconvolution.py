@@ -5,7 +5,7 @@ import numpy as np
 import numpy.testing
 import pandas as pd
 
-from NMMFlex.NMMFlex import NMMFlex
+from src.NMMFlex.factorization import factorization
 
 
 # TODO improve the tests cases dividing it in three: general, gridsearch and
@@ -33,7 +33,7 @@ class test_NMMFlex_deconvolution(unittest.TestCase):
     def setUp(self):
         # Let's import the data
         self._import_test_data()
-        self.dec = NMMFlex()
+        self.dec = factorization()
 
     def tearDown(self):
         del self.bulk_methylation_matrix

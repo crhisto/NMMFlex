@@ -1,6 +1,6 @@
-from setuptools import setup
+from setuptools import setup, find_namespace_packages
 
-with open('NMMFlex/README.md', 'r') as f:
+with open('src/README.md', 'r') as f:
     long_description = f.read()
 
 setup(
@@ -15,7 +15,8 @@ setup(
     author='Crhistian Cardona',
     url='https://github.com/crhisto/NMMFlex',
     author_email='crhisto@gmail.com',
-    packages=['NMMFlex'],
+    package_dir={'': 'src'},
+    packages=find_namespace_packages(where='src'),
     install_requires=open('requirements.txt').readlines(),
     test_suite="tests",
     classifiers=[

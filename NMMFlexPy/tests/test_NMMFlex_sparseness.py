@@ -3,14 +3,14 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from NMMFlex.NMMFlex import NMMFlex
+from src.NMMFlex.factorization import factorization
 
 
 class test_NMMFlex_sparseness(unittest.TestCase):
 
     # This function will be called for each tests.
     def setUp(self):
-        self.dec = NMMFlex()
+        self.dec = factorization()
 
     def tearDown(self):
         del self.dec

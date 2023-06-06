@@ -13,8 +13,8 @@ from tests.test_NMMFlex_sparseness_deconvolution \
 
 # Run the following from the PyCharm virtual environment
 # cd NMMFlexPy
-# coverage run --source=NMMFlex -m pytest --rootdir=. tests/test_suite.py
-# pytest --cov=NMMFlex tests/test_suite.py --cov-report=html
+# coverage run --source=src -m pytest --rootdir=. tests/test_suite.py
+# pytest --cov=src tests/test_suite.py --cov-report=html
 # Fix the problem with debugging after coverage running in PyCharm
 # find . -name __pycache__ -type d -exec rm -rf {} \;
 

@@ -29,4 +29,4 @@ jobs:
           ruff --format=github --target-version=py39 .
       - name: Test with pytest and coverage
         run: |
-          pytest --cov=NMMFlexPy/NMMFlex --cov-report=term NMMFlexPy/tests/test_suite.py
+          pytest --cov=NMMFlexPy/src --cov-report=term NMMFlexPy/tests/test_suite.py

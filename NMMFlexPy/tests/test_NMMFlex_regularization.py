@@ -2,10 +2,9 @@ import unittest
 from os import getcwd
 
 import numpy as np
-import numpy.testing
 import pandas as pd
 
-from NMMFlex.NMMFlex import NMMFlex
+from src.NMMFlex.factorization import factorization
 
 
 class test_NMMFlex_regularization(unittest.TestCase):
@@ -31,7 +30,7 @@ class test_NMMFlex_regularization(unittest.TestCase):
     def setUp(self):
         # Let's import the data
         self._import_test_data()
-        self.dec = NMMFlex()
+        self.dec = factorization()
 
     def tearDown(self):
         del self.bulk_methylation_matrix

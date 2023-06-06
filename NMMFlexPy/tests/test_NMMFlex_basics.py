@@ -5,13 +5,13 @@ import numpy as np
 import pandas as pd
 import pandas.core.frame
 
-from NMMFlex.NMMFlex import NMMFlex
+from src.NMMFlex.factorization import factorization
 
 
 class test_NMMFlex_basics(unittest.TestCase):
     """
     The test_NMMFlex_basics class is a TestCase subclass for testing the basics
-    of NMMFlex.
+    of src.
 
     Attributes:
 
@@ -61,7 +61,7 @@ class test_NMMFlex_basics(unittest.TestCase):
     def setUp(self):
         # Let's import the data
         self._import_test_data()
-        self.dec = NMMFlex()
+        self.dec = factorization()
 
     def tearDown(self):
         del self.bulk_methylation_matrix
