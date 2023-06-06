@@ -49,10 +49,13 @@ class test_NMMFlex_basics(unittest.TestCase):
         super(test_NMMFlex_basics, self).__init__(relative_path)
         # To allow the test cases to run from different configurations of main
         # path without problems
+        print('Current root path where everything is ran:', getcwd())
         if 'tests' in getcwd():
             self.relative_path = getcwd() + '/'
-        else:
+        elif 'NMMFlexPy' in getcwd():
             self.relative_path = getcwd() + "/tests/"
+        else:
+            self.relative_path = getcwd() + "/NMMFlexPy/tests/"
 
     # This function will be called for each test.
     def setUp(self):

@@ -24,8 +24,10 @@ class test_NMMFlex_deconvolution(unittest.TestCase):
         # main path without problems
         if 'tests' in getcwd():
             self.relative_path = getcwd() + '/'
-        else:
+        elif 'NMMFlexPy' in getcwd():
             self.relative_path = getcwd() + "/tests/"
+        else:
+            self.relative_path = getcwd() + "/NMMFlexPy/tests/"
 
     # This function will be called for each test.
     def setUp(self):
