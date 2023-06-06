@@ -7,7 +7,8 @@ from tests.test_NMMFlex_gridsearch import test_NMMFlex_gridsearch
 from tests.test_NMMFlex_regularization import test_NMMFlex_regularization
 from tests.test_NMMFlex_sparseness import test_NMMFlex_sparseness
 from tests.test_NMMFlex_sparseness_core import test_NMMFlex_sparseness_core
-from tests.test_NMMFlex_sparseness_deconvolution import test_NMMFlex_sparseness_deconvolution
+from tests.test_NMMFlex_sparseness_deconvolution \
+    import test_NMMFlex_sparseness_deconvolution
 
 
 # Run the following from the PyCharm virtual environment

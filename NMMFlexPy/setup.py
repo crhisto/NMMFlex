@@ -6,9 +6,10 @@ with open('NMMFlex/README.md', 'r') as f:
 setup(
     name='NMMFlex',
     version='0.1.0',
-    description='A Python package for NMMFlex which is an implementation of the Non-negative Multiple Matrix '
-                'Factorization (NMMF) algorithm proposed in Takeuchi et al, 2013 with some improvements and '
-                'modifications.',
+    description='A Python package for NMMFlex which is an implementation of '
+                'the Non-negative Multiple Matrix Factorization (NMMF) '
+                'algorithm proposed in Takeuchi et al, 2013 with some '
+                'improvements and modifications.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='Crhistian Cardona',
