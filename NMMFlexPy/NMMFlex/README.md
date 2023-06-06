@@ -4,6 +4,8 @@
     <img src="../../images/NMMFlexPy.png" alt="Logo" width="300" height="150">
 </div>
 
+![Repository status](https://github.com/crhisto/NMMFlex/actions/workflows/python-app/badge.svg?event=push)
+
 # NMMFlex in Python (NMMFlexPy)
 
 Introducing NMMFlex, a Python package that enhances and extends the functionality of the Non-negative Multiple Matrix Factorization (NMMF) algorithm. This innovative solution, originally proposed by [Takeuchi et al. (2013)](https://www.ijcai.org/Proceedings/13/Papers/254.pdf), has been refined and adapted through our package to maximize its potential. NMMFlex offers an advanced implementation, bringing significant improvements and bespoke modifications to the core NMMF algorithm.
@@ -22,11 +24,12 @@ NMMFlexPy requires the following dependencies, which will be installed automatic
 - pandas>=2.0.2
 - pyparsing>=3.0.7
 - scipy>=1.10.1
-- setuptools>=67.8.0
 - deprecation>=2.1.0
+- sphinx>=7.0.1
+- scikit-learn>=1.2.2
+- setuptools>=67.8.0
 - pytest>=7.3.1
 - pytest-cov>=4.1.0
-- sphinx>=7.0.1
 
 ## Usage
 
@@ -193,6 +196,17 @@ With pytest and pytest-cov installed, you can generate the code coverage report 
 ```shell
 pytest --cov=NMMFlex tests/ --cov-report=html
 ```
+
+## CI Pipeline
+
+The project has a CI pipeline configured in GitHub Actions. The pipeline performs the following steps:
+
+1. **Install Dependencies**: Installs the project dependencies required for the build process.
+2. **Lint with Ruff**: Runs the linter to check for any code style or formatting issues.
+3. **Run Unit Tests**: Executes all the unit tests to ensure the functionality of the project.
+4. **Calculate Test Coverage**: Measures the test coverage of the project to assess code quality.
+
+You can find the status of the CI pipeline in the badge at the top of this README.
 
 ## Contributing, comments and bugs
 
