@@ -1,3 +1,5 @@
+[![Python package](https://github.com/crhisto/NMMFlex/actions/workflows/python-app.yml/badge.svg)](https://github.com/crhisto/NMMFlex/actions/workflows/python-app.yml)
+
 # NMMFlex: A Comprehensive Non-negative Multiple Matrix Factorization (NMMF) Solution
 
 <!-- Diagram with NMMFlex -->

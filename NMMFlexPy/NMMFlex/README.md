@@ -1,10 +1,10 @@
+[![Python package](https://github.com/crhisto/NMMFlex/actions/workflows/python-app.yml/badge.svg)](https://github.com/crhisto/NMMFlex/actions/workflows/python-app.yml)
+
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
     <img src="../../images/NMMFlexPy.png" alt="Logo" width="300" height="150">
 </div>
-
-![Repository status](https://github.com/crhisto/NMMFlex/actions/workflows/python-app/badge.svg?event=push)
 
 # NMMFlex in Python (NMMFlexPy)
 
