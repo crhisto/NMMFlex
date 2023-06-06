@@ -205,24 +205,54 @@ class test_NMMFlex_basics(unittest.TestCase):
             'The matrix created with dot method is different to the one ' +
             'created with the extended method')
 
-    def test_normalization(self):
+    def test_normalization_quantile(self):
         matrix_quantile_normalization = self.dec.normalization(
             matrix=self.bulk_methylation_matrix,
             normalization_type='quantile_norm')
-
-        matrix_min_max = self.dec.normalization(
-            matrix=matrix_quantile_normalization,
-            normalization_type='norm_zero_min_max')
-
-        matrix_quantile_normalization_min_max = self.dec.normalization(
-            matrix=self.bulk_methylation_matrix,
-            normalization_type='quantile_norm_min_max')
 
         print(type(matrix_quantile_normalization))
         print("pandas.core.frame.DataFrame" ==
               type(matrix_quantile_normalization))
         print(isinstance(matrix_quantile_normalization,
                          pandas.core.frame.DataFrame))
+
+        # quantile_normalization
+        check_results_quantile_normalization = \
+            np.all((matrix_quantile_normalization >= 0) &
+                   (matrix_quantile_normalization <= 1))
+
+        self.assertTrue(check_results_quantile_normalization,
+                        'The matrix was not quantile normalized.')
+
+    def test_normalization_zero_min_max(self):
+
+        matrix_zero_min_max = self.dec.normalization(
+            matrix=self.bulk_methylation_matrix,
+            normalization_type='norm_zero_min_max')
+
+        # quantile_normalization_min_max
+        check_results_min_max = np.all(
+            (matrix_zero_min_max >= 0) &
+            (matrix_zero_min_max <= 1))
+
+        self.assertTrue(check_results_min_max,
+                        'The matrix was not min_max '
+                        'normalized.')
+
+    def test_normalization_quantile_norm_min_max(self):
+
+        matrix_quantile_normalization_min_max = self.dec.normalization(
+            matrix=self.bulk_methylation_matrix,
+            normalization_type='quantile_norm_min_max')
+
+        # quantile_normalization_min_max
+        check_results_quantile_normalization_min_max = np.all(
+            (matrix_quantile_normalization_min_max >= 0 &
+            (matrix_quantile_normalization_min_max <= 1)))
+
+        self.assertTrue(check_results_quantile_normalization_min_max,
+                        'The matrix was not quantile_normalization_min_max '
+                        'normalized.')
 
 
 if __name__ == '__main__':

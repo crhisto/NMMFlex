@@ -19,6 +19,8 @@ class test_NMMFlex_sparseness_core(unittest.TestCase):
     x_sparse = None
     y_sparse = None
     z_sparse = None
+    w_sparse = None
+    h_sparse = None
 
     def setUp(self):
         self.dec = NMMFlex()
@@ -85,6 +87,8 @@ class test_NMMFlex_sparseness_core(unittest.TestCase):
         self.x_sparse = csr_matrix(self.x.astype(float))
         self.y_sparse = csr_matrix(self.y.astype(float))
         self.z_sparse = csr_matrix(self.z.astype(float))
+        self.w_sparse = csr_matrix(w_sparse.astype(float))
+        self.h_sparse = csr_matrix(h_sparse.astype(float))
 
         # Now let's put zeros and nulls in the reads
         rest_x = self.x_sparse[0, 1] + \
@@ -111,7 +115,7 @@ class test_NMMFlex_sparseness_core(unittest.TestCase):
         self.y_sparse[5, 2] = np.nan
 
         # Now let's put zeros and nulls in the reads
-        rest_z = self.z_sparse[0, 3] +\
+        rest_z = self.z_sparse[0, 3] + \
                  self.z_sparse[1, 2] + \
                  self.z_sparse[2, 0]
         print('In Z sparse the sum of values missing is: ', rest_z)
@@ -320,12 +324,20 @@ class test_NMMFlex_sparseness_core(unittest.TestCase):
                                                        type_analysis='nulls')
         sparsity_zeros = self.dec.sparsity_calculation(w_new,
                                                        type_analysis='zeros')
-
+        # Check nulls
         self.assertEqual(
             w_new is not None, True,
             'The matrix W is calculate based on a X and Z sparse matrix.')
         self.assertEqual(sparsity_nulls, 0.0,
                          'The W matrix does not have nulls')
+
+        # Check zeros: The reality is that after factorization it is
+        # possible to get some zeros in the factorized matrices.
+        self.assertEqual(
+            w_new is not None, True,
+            'The matrix W is calculate based on a X and Z sparse matrix.')
+        self.assertEqual(sparsity_zeros, 0.25,
+                         'The W matrix does not have zeros')
 
 
 if __name__ == '__main__':
