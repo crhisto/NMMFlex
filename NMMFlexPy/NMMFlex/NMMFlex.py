@@ -1462,7 +1462,8 @@ class NMMFlex:
         """
         This function implements a version of quantile normalization on a given
         matrix. The code is adapted from
-        https://cmdlinetips.com/2020/06/computing-quantile-normalization-in-python/ # pylint: disable=line-too-long
+        url{https://cmdlinetips.com/2020/06/
+        computing-quantile-normalization-in-python/}
         The input matrix can be either a numpy ndarray or a pandas DataFrame.
 
         Parameters:
@@ -2382,15 +2383,16 @@ class NMMFlex:
         else:
             if method == 'random_based.uniform':
                 # The python function rand:
-                # https://numpy.org/doc/stable/reference/random/generated/numpy.random.rand.html # pylint: disable=line-too-long
-                # Create an array of the given shape and populate it with
+                # url{https://numpy.org/doc/stable/reference/random/generated/
+                # numpy.random.rand.html}
                 # random samples from a uniform distribution
                 # over [0, 1).
                 new_matrix = np.random.rand(size_rows, size_columns)
             elif method == 'random_based.power':
                 # Draw samples in [0, 1] from a power distribution with
                 # positive exponent a - 1.
-                # https://numpy.org/doc/stable/reference/random/generated/numpy.random.power.html # pylint: disable=line-too-long
+                # url{https://numpy.org/doc/stable/reference/random/generated/
+                # numpy.random.power.html}
                 # Also known as the power function distribution
                 new_matrix = np.random.power(a=size_rows, size=size_columns)
             elif method == 'nndsvd':
