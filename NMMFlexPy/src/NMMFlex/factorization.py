@@ -11,7 +11,6 @@ __version__ = '0.1.0'
 __author__ = 'Crhistian Cardona <crhisto@gmail.com>'
 
 import math
-import multiprocessing as mp
 import numbers
 
 import deprecation
