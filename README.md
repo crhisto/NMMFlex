@@ -40,7 +40,7 @@ Both versions of the algorithm aim to factorize a given matrix into two non-nega
 
 ## Installation and Guidance
 For each version, you'll find a dedicated subdirectory that offers comprehensive instructions and practical usage examples:
-- [NMMFlexPy](./NMMFlexPy/NMMFlex/README.md): For the Python implementation.
+- [NMMFlexPy](./NMMFlexPy/src/README.md): For the Python implementation.
 - [NMMFlexR](./NMMFlexR/): For the R wrapper.
 
 Please navigate to the specific README files in these subdirectories for step-by-step installation guidelines and detailed usage instructions.

@@ -94,9 +94,10 @@ This code first imports numpy and creates an instance of the class containing th
 
 ```python
 import numpy as np
+from NMMFlex import factorization, grid_search
 
 # An instance of the class which has the method
-obj = MyClass()
+obj = NMMFlex.factorization()
 
 # Define the three matrices and k
 x_matrix = np.random.rand(10, 10)
@@ -180,6 +181,9 @@ pip install sphinx
 Once Sphinx is installed, you can generate the documentation by executing the command below from the directory `[relative_path]/NMMFlexPy/NMMFlex/docs`:
 
 ```shell
+cd src/
+sphinx-quickstart docs 
+cd docs
 sphinx-build -b html source build
 ```
 
@@ -194,7 +198,7 @@ pip install pytest pytest-cov
 With pytest and pytest-cov installed, you can generate the code coverage report by executing the following command from the directory `[relative_path]/NMMFlexPy`:
 
 ```shell
-pytest --cov=NMMFlex tests/ --cov-report=html
+pytest --cov=src tests/test_suite.py --cov-report=html
 ```
 
 ## CI Pipeline
