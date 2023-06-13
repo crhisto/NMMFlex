@@ -8,7 +8,7 @@ from src.NMMFlex.factorization import factorization
 
 class test_NMMFlex_sparseness(unittest.TestCase):
 
-    # This function will be called for each tests.
+    # This function will be called for each test.
     def setUp(self):
         self.dec = factorization()
 

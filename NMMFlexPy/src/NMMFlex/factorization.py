@@ -21,6 +21,17 @@ from scipy.sparse import csr_matrix, lil_matrix
 from sklearn.preprocessing import quantile_transform
 from sklearn.utils.validation import check_non_negative
 
+# This is related with the warning: "FutureWarning: elementwise comparison
+# failed; returning scalar, but in the future will perform elementwise
+# comparison". You can check the original issue:
+# https://stackoverflow.com/questions/40659212/. The function affected is:
+# _standardize_sparse_matrix. Since this is a clear disagreement between Numpy
+# and native python on what should happen when you compare a strings to
+# numpy's numeric types, I will follow the advice of skyping the message
+# because it seems that is not going to change the behaviour in the future and
+# my code is going to run anyway correctly.
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # Code created based on the pep-0008: https://www.python.org/dev/peps/pep-0008/
 # TODO: Check constraints for the entire set of matrices in the multiple
@@ -347,14 +358,26 @@ class factorization:
             z_matrix = self._standardize_sparse_matrix(z_matrix)
 
         # 2. Let's tests the basic constrains of the input matrices
-        self._check_parameters(x_matrix, y_matrix, z_matrix, k, alpha, beta,
-                               delta_threshold, max_iterations,
-                               print_limit, proportion_constraint_h,
-                               regularize_w, alpha_regularizer_w, fixed_w,
-                               fixed_h, fixed_a, fixed_b, initialized_w,
-                               initialized_h, initialized_a, initialized_b,
-                               init_method_w, init_method_h, init_method_a,
-                               init_method_b)
+        self._check_parameters(x_matrix=x_matrix, y_matrix=y_matrix,
+                               z_matrix=z_matrix, k=k, alpha=alpha, beta=beta,
+                               delta_threshold=delta_threshold,
+                               max_iterations=max_iterations,
+                               print_limit=print_limit,
+                               proportion_constraint_h=proportion_constraint_h,
+                               regularize_w=regularize_w,
+                               alpha_regularizer_w=alpha_regularizer_w,
+                               fixed_w=fixed_w,
+                               fixed_h=fixed_h,
+                               fixed_a=fixed_a,
+                               fixed_b=fixed_b,
+                               initialized_w=initialized_w,
+                               initialized_h=initialized_h,
+                               initialized_a=initialized_a,
+                               initialized_b=initialized_b,
+                               init_method_w=init_method_w,
+                               init_method_h=init_method_h,
+                               init_method_a=init_method_a,
+                               init_method_b=init_method_b)
 
         # 3. We need to inform about the current configuration of the method in
         # terms of sparsity
@@ -453,15 +476,16 @@ class factorization:
             h = np.array(fixed_h)
             h_new = h
 
+        # TODO: check this validations: for a grid_search is not working!
         # In case of some combinations of fixed matrices that get the
         # (gamma, alpha, beta) = 0
-        gamma, alpha, beta = \
-            self.check_fixed_matrices_gamma_alpha_beta(fixed_w=fixed_w,
-                                                       fixed_h=fixed_h,
-                                                       fixed_a=fixed_a,
-                                                       fixed_b=fixed_b,
-                                                       gamma=gamma,
-                                                       alpha=alpha, beta=beta)
+        # gamma, alpha, beta = \
+        #     self.check_fixed_matrices_gamma_alpha_beta(fixed_w=fixed_w,
+        #                                                fixed_h=fixed_h,
+        #                                                fixed_a=fixed_a,
+        #                                                fixed_b=fixed_b,
+        #                                                gamma=gamma,
+        #                                                alpha=alpha, beta=beta)
 
         print("Values of parameters: gamma: ", str(gamma), ', alpha: ',
               str(alpha), ', beta: ', str(beta))
@@ -2932,18 +2956,20 @@ class factorization:
         If the input matrix cannot be converted to float.
         """
 
-        print("Standardizing sparse matrix...")
+        print("Standardizing sparse matrix...", 'pd.DataFrame: ',
+              isinstance(matrix, pd.DataFrame))
 
         # Let's take the original row and column names
         column_names = matrix.columns.values
         row_names = matrix.index.values
 
         # Now we should convert to array to do the replacement
-        #matrix = np.array(matrix).astype(float)
+        # matrix = np.array(matrix).astype(float)
 
         # Check for the null values and set them up as np.nan.
 
         # 1. replace "" values for np.nan
+        # warnings.simplefilter(action='ignore', category=FutureWarning)
         standardized_matrix = np.where(matrix != '', matrix, np.nan)
 
         # 2. replace "null" values for np.nan
@@ -3021,7 +3047,7 @@ class factorization:
         if fixed_w is not None and fixed_h is not None:
             # 1. Since the W and H are fixed, Gamma must be 0 to avoid the
             # calculation of the divergence(X|WH)
-            gamma = 0
+            gamma = 0 #TODO Fixt this validation
             print('The Gamma variable has been changed to zero because W and H'
                   ' are fixed. The divergence(X|WH) will not'
                   ' be calculated')
@@ -3029,7 +3055,7 @@ class factorization:
         if fixed_a is not None and fixed_h is not None:
             # 2. Since the A and H are fixed, alpha must be 0 to avoid the
             # calculation of the divergence(Y|AH)
-            alpha = 0
+            alpha = 0 #TODO Fixt this validation
             print('The alpha variable has been changed to zero because A and '
                   'H are fixed. The divergence(Y|AH) will not be calculated')
 

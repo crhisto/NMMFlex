@@ -143,24 +143,25 @@ class grid_search:
         print("Values of parameters: gamma: ", str(gamma), ', alpha: ',
               str(alpha), ', beta: ', str(beta))
 
+        # TODO Check this validation
         # Double check of the gamma, alpha and beta parameters to avoid wrong
         # interpretations of results when a list of values is given. Also, the
         # idea is not running expensive resources without necessity.
-        if gamma == 0 and alpha == 0:
-            raise ValueError("Gamma and alpha are zero, therefore the model "
-                             "is a standard NMF such argmin D(Z|WB). Switch to"
-                             " the more direct function: "
-                             "run_deconvolution_multiple().")
-        if gamma == 0 and beta == 0:
-            raise ValueError("Gamma and beta are zero, therefore the model is "
-                             "a standard NMF such argmin D(Y|AH). Switch to "
-                             "the more direct function: "
-                             "run_deconvolution_multiple().")
-        if alpha == 0 and beta == 0:
-            raise ValueError("Alpha and beta are zero, therefore the model is "
-                             "a standard NMF such argmin D(X|WH). "
-                             "Switch to the more direct function: "
-                             "run_deconvolution_multiple().")
+        # if gamma == 0 and alpha == 0:
+        #     raise ValueError("Gamma and alpha are zero, therefore the model "
+        #                      "is a standard NMF such argmin D(Z|WB). Switch to"
+        #                      " the more direct function: "
+        #                      "run_deconvolution_multiple().")
+        # if gamma == 0 and beta == 0:
+        #     raise ValueError("Gamma and beta are zero, therefore the model is "
+        #                      "a standard NMF such argmin D(Y|AH). Switch to "
+        #                      "the more direct function: "
+        #                      "run_deconvolution_multiple().")
+        # if alpha == 0 and beta == 0:
+        #     raise ValueError("Alpha and beta are zero, therefore the model is "
+        #                      "a standard NMF such argmin D(X|WH). "
+        #                      "Switch to the more direct function: "
+        #                      "run_deconvolution_multiple().")
 
         # By default, I will use the total number of CPU's minus one.
         cpu_count_selected = threads
@@ -308,10 +309,14 @@ class grid_search:
 
         dec_object = factorization()
         result = dec_object.run_deconvolution_multiple(
-            bulk_data_methylation, bulk_data_expression,
-            data_expression_auxiliary, k, alpha, beta, delta_threshold,
-            max_iterations, print_limit, proportion_constraint_h, regularize_w,
-            alpha_regularizer_w, fixed_w, fixed_h, fixed_a, fixed_b)
+            x_matrix=bulk_data_methylation, y_matrix=bulk_data_expression,
+            z_matrix=data_expression_auxiliary, k=k, alpha=alpha, beta=beta,
+            delta_threshold=delta_threshold,
+            max_iterations=max_iterations, print_limit=print_limit,
+            proportion_constraint_h=proportion_constraint_h,
+            regularize_w=regularize_w,
+            alpha_regularizer_w=alpha_regularizer_w,
+            fixed_w=fixed_w, fixed_h=fixed_h, fixed_a=fixed_a, fixed_b=fixed_b)
 
         return result
 

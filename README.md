@@ -62,4 +62,4 @@ Should you have any inquiries or require further assistance, we encourage you to
 
 We truly appreciate your interest in our NMMF algorithm implementation and eagerly look forward to your feedback.
 
-Happy matrix factorizing!
+Happy multiple matrix factorizing!
