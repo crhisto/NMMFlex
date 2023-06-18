@@ -84,7 +84,8 @@ class grid_search:
             number of CPUs minus one. Default is 0.
 
         proportion_constraint_h : bool, optional
-            Whether to apply proportion constraint on H matrix. Default is True.
+            Whether to apply proportion constraint on H matrix. Default is
+            True.
 
         regularize_w : bool, optional
             Whether to apply regularization on W matrix. Default is None.
@@ -149,16 +150,16 @@ class grid_search:
         # idea is not running expensive resources without necessity.
         # if gamma == 0 and alpha == 0:
         #     raise ValueError("Gamma and alpha are zero, therefore the model "
-        #                      "is a standard NMF such argmin D(Z|WB). Switch to"
-        #                      " the more direct function: "
-        #                      "run_deconvolution_multiple().")
+        #                    "is a standard NMF such argmin D(Z|WB). Switch to"
+        #                    " the more direct function: "
+        #                    "run_deconvolution_multiple().")
         # if gamma == 0 and beta == 0:
-        #     raise ValueError("Gamma and beta are zero, therefore the model is "
+        #   raise ValueError("Gamma and beta are zero, therefore the model is "
         #                      "a standard NMF such argmin D(Y|AH). Switch to "
         #                      "the more direct function: "
         #                      "run_deconvolution_multiple().")
         # if alpha == 0 and beta == 0:
-        #     raise ValueError("Alpha and beta are zero, therefore the model is "
+        #   raise ValueError("Alpha and beta are zero, therefore the model is "
         #                      "a standard NMF such argmin D(X|WH). "
         #                      "Switch to the more direct function: "
         #                      "run_deconvolution_multiple().")
