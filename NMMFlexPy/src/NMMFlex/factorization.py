@@ -2832,9 +2832,9 @@ class factorization:
                             str(np.shape(x_matrix)[1]), "], " +
                             "Y[", str(np.shape(y_matrix)[0]), ',',
                             str(np.shape(y_matrix)[1]), "], " +
-                            "Y[", str(np.shape(z_matrix)[0]), ',',
+                            "Z[", str(np.shape(z_matrix)[0]), ',',
                             str(np.shape(z_matrix)[1]), "]"
-                        )
+                        )`
                 else:
                     expression_x_y_matrices = \
                         np.shape(x_matrix)[1] == np.shape(y_matrix)[1]
