@@ -246,6 +246,11 @@ class factorization:
                                    init_method_h='random_based.uniform',
                                    init_method_a='random_based.uniform',
                                    init_method_b='random_based.uniform',
+                                   partial_w_fixed=None,
+                                   partial_h_fixed=None,
+                                   w_mask_fixed=None,
+                                   h_mask_fixed=None,
+                                   batches_partial_fixed=1,
                                    verbose=True):
         """
         Function that runs the src with three matrices as input. You can
@@ -303,6 +308,21 @@ class factorization:
                 Default is 'random_based.uniform'.
             init_method_b (str, optional): The initialization method for B.
                 Default
+            partial_w_fixed (np.ndarray, optional): The partial fixed matrix
+                for W. If None, no fixed matrix for W is used. Defaults to
+                None.
+            partial_h_fixed (np.ndarray, optional): The partial fixed matrix
+                for H. If None, no fixed matrix for H is used. Defaults to
+                None.
+            w_mask_fixed (np.ndarray, optional): A mask matrix for W defining
+                the positions that are fixed with TRUE values. If None, no
+                mask is applied. Defaults to None.
+            h_mask_fixed (np.ndarray, optional): A mask matrix for H defining
+                the positions that are fixed with TRUE values. If None, no
+                mask is applied. Defaults to None.
+            batches_partial_fixed (int, optional): Defines the number of
+                batches where the procedure will inject again the partially
+                fixed matrices. Defaults to 1.
             verbose (bool, optional): Whether to display progress messages
                 during deconvolution. Default is True.
 
@@ -357,7 +377,7 @@ class factorization:
         if z_matrix is not None:
             z_matrix = self._standardize_sparse_matrix(z_matrix)
 
-        # 2. Let's tests the basic constrains of the input matrices
+        # 2. Lets tests the basic constrains of the input matrices
         self._check_parameters(x_matrix=x_matrix, y_matrix=y_matrix,
                                z_matrix=z_matrix, k=k, alpha=alpha, beta=beta,
                                delta_threshold=delta_threshold,
@@ -475,6 +495,19 @@ class factorization:
         else:
             h = np.array(fixed_h)
             h_new = h
+
+        # Partial fixed matrices and replace at the beginning through a mask
+        if partial_h_fixed is not None and h_mask_fixed is not None:
+            # We know that the matrix h is now all zeros.
+            # Since I received the parameter with the mask, I apply it
+            np.putmask(h, h_mask_fixed, partial_h_fixed)
+            h_new = h
+
+        if partial_w_fixed is not None and w_mask_fixed is not None:
+            # We know that the matrix h is now all zeros.
+            # Since I received the parameter with the mask, I apply it
+            np.putmask(w, w_mask_fixed, partial_w_fixed)
+            h_new = w
 
         # TODO: check this validations: for a grid_search is not working!
         # In case of some combinations of fixed matrices that get the
@@ -604,6 +637,21 @@ class factorization:
             if fixed_h is None:
                 h = h_new
 
+            # To apply the partial replacement with the partial_references
+            # using the mask provided as parameter
+            if iterations % batches_partial_fixed == 0:
+                # Addition of compatibility with partial fixed references.
+                if partial_h_fixed is not None and h_mask_fixed is not None:
+                    # We know that the matrix h is now all zeros.
+                    # Since I received the parameter with the mask, I apply it
+                    np.putmask(h, h_mask_fixed, partial_h_fixed)
+
+                if partial_w_fixed is not None and w_mask_fixed is not None:
+                    # We know that the matrix h is now all zeros.
+                    # Since I received the parameter with the mask, I apply it
+                    np.putmask(w, w_mask_fixed, partial_w_fixed)
+
+            # I iterate to the next step.
             iterations += 1
 
         print("The process finished!")
@@ -2834,7 +2882,7 @@ class factorization:
                             str(np.shape(y_matrix)[1]), "], " +
                             "Z[", str(np.shape(z_matrix)[0]), ',',
                             str(np.shape(z_matrix)[1]), "]"
-                        )`
+                        )
                 else:
                     expression_x_y_matrices = \
                         np.shape(x_matrix)[1] == np.shape(y_matrix)[1]
