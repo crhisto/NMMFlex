@@ -43,7 +43,12 @@ class grid_search:
                                             regularize_w=None,
                                             alpha_regularizer_w_list=None,
                                             fixed_w=None, fixed_h=None,
-                                            fixed_a=None, fixed_b=None):
+                                            fixed_a=None, fixed_b=None,
+                                            constraint_type_w=None,
+                                            constraint_value_w=None,
+                                            constraint_type_a=None,
+                                            constraint_value_a=None
+                                            ):
         """
         Performs a grid search in a parallelized manner over different values
         of alpha and beta in the Non-negative matrix factorization. The search
@@ -109,6 +114,28 @@ class grid_search:
         fixed_b : array-like, optional
             Fixed matrix B. If None, it implies that B is not fixed. Default is
             None.
+
+        constraint_type_w : str, optional
+            Type of constraint to apply to the w Matrix during
+            deconvolution depending on the data used.
+            Possible values are: 'sigmoid', 'power', 'exp', 'zero_one', or
+            None. If None, no constraint is applied.
+
+        constraint_value_w : float or None, optional
+            The value to use for the constraint on the w Matrix.
+            If None and constraint_type_w is not None, a default value will
+             be used.
+
+        constraint_type_a : str, optional
+            Type of constraint to apply to the A Matrix during
+            deconvolution depending on the data used.
+            Possible values are: 'sigmoid', 'power', 'exp', 'zero_one', or
+            None. If None, no constraint is applied.
+
+        constraint_value_a : float or None, optional
+            The value to use for the constraint on the A Matrix.
+            If None and constraint_type_a is not None, a default value
+            will be used.
 
         Returns:
 
@@ -211,7 +238,10 @@ class grid_search:
                       print_limit,
                       proportion_constraint_h,
                       regularize_w, 0,
-                      fixed_w, fixed_h, fixed_a, fixed_b))
+                      fixed_w, fixed_h, fixed_a, fixed_b,
+                      constraint_type_w, constraint_value_w,
+                      constraint_type_a, constraint_value_a
+                      ))
                 for alpha_beta_value_iter in alpha_beta_combinations]
         else:
             # call apply_async() without callback
@@ -226,7 +256,10 @@ class grid_search:
                       print_limit,
                       proportion_constraint_h,
                       regularize_w, alpha_regularizer_w_value_iter,
-                      fixed_w, fixed_h, fixed_a, fixed_b))
+                      fixed_w, fixed_h, fixed_a, fixed_b,
+                      constraint_type_w, constraint_value_w,
+                      constraint_type_a, constraint_value_a
+                      ))
                 for alpha_regularizer_w_value_iter in alpha_regularizer_w_list]
 
         pool.close()
@@ -242,7 +275,12 @@ class grid_search:
                                 delta_threshold, max_iterations, print_limit,
                                 proportion_constraint_h, regularize_w=None,
                                 alpha_regularizer_w=0, fixed_w=None,
-                                fixed_h=None, fixed_a=None, fixed_b=None):
+                                fixed_h=None, fixed_a=None, fixed_b=None,
+                                constraint_type_w=None,
+                                constraint_value_w=None,
+                                constraint_type_a=None,
+                                constraint_value_a=None
+                                ):
         """
         Executes the deconvolution process for Non-negative Multiple Matrix
         Factorization (NMMF). The deconvolution process for Non-negative
@@ -303,6 +341,28 @@ class grid_search:
             Fixed matrix B. If None, it implies that B is not fixed. Default is
             None.
 
+        constraint_type_w : str, optional
+            Type of constraint to apply to the w Matrix during
+            deconvolution depending on the data used.
+            Possible values are: 'sigmoid', 'power', 'exp', 'zero_one', or
+            None. If None, no constraint is applied.
+
+        constraint_value_w : float or None, optional
+            The value to use for the constraint on the w Matrix.
+            If None and constraint_type_w is not None, a default value will
+             be used.
+
+        constraint_type_a : str, optional
+            Type of constraint to apply to the A Matrix during
+            deconvolution depending on the data used.
+            Possible values are: 'sigmoid', 'power', 'exp', 'zero_one', or
+            None. If None, no constraint is applied.
+
+        constraint_value_a : float or None, optional
+            The value to use for the constraint on the A Matrix.
+            If None and constraint_type_a is not None, a default value
+            will be used.
+
         Returns:
         result : src object
         src object containing the results of the deconvolution process.
@@ -317,7 +377,12 @@ class grid_search:
             proportion_constraint_h=proportion_constraint_h,
             regularize_w=regularize_w,
             alpha_regularizer_w=alpha_regularizer_w,
-            fixed_w=fixed_w, fixed_h=fixed_h, fixed_a=fixed_a, fixed_b=fixed_b)
+            fixed_w=fixed_w, fixed_h=fixed_h, fixed_a=fixed_a, fixed_b=fixed_b,
+            constraint_type_w=constraint_type_w,
+            constraint_value_w=constraint_value_w,
+            constraint_type_a=constraint_type_a,
+            constraint_value_a=constraint_value_a
+        )
 
         return result
 

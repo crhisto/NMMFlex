@@ -174,6 +174,64 @@ class test_NMMFlex_basics(unittest.TestCase):
             3, h_new_sum,
             'Each column sums 1 in the H matrix (proportion matrix)')
 
+    def test_proportion_constraint_h_partial_fixed(self):
+
+        h = np.array([[0.11692266, 0.49023124, 0.03157466],
+                      [0.38518708, 0.08108722, 0.34163091],
+                      [0.11876603, 0.26641129, 0.75638277],
+                      [0.42219656, 0.17418068, 0.06863269]]).astype(float)
+
+        # Row and column names
+        column_names = ['column_1', 'column_2', 'column_3']
+        row_names = ['row_1', 'row_3', 'row_3', 'cluster_unknown']
+
+        # We define and np array initially
+        h_mask_fixed = np.ones(shape=np.shape(h), dtype=bool)
+        h_mask_fixed[[0, 1, 2], :] = False
+        # Then we generate the DataFrame that must have the names
+        # (index, columns)
+        h_mask_fixed_df = pd.DataFrame(data=np.nan_to_num(h_mask_fixed,
+                                                          nan=-1),
+                                       index=row_names,
+                                       columns=column_names)
+
+        h_new = self.dec._proportion_constraint_h(h=h,
+                                                  h_mask_fixed=h_mask_fixed_df)
+
+        # Now we test if the first rows are 1 deleting the unknown one
+        prop_columns = h_new[[0, 1, 2], :].sum(axis=0)
+        self.assertTrue(np.all(np.round(prop_columns, 3) == 1.0),
+                        'All known variables sum up 1.')
+
+    def test_proportion_constraint_h_partial_fixed_multiple_k(self):
+
+        h = np.array([[0.11692266, 0.49023124, 0.03157466],
+                      [0.38518708, 0.08108722, 0.34163091],
+                      [0.11876603, 0.26641129, 0.75638277],
+                      [0.42219656, 0.17418068, 0.06863269]]).astype(float)
+
+        # Row and column names
+        column_names = ['column_1', 'column_2', 'column_3']
+        row_names = ['row_1', 'row_3', 'cluster_unknown_01', 'cluster_unknown_02']
+
+        # We define and np array initially
+        h_mask_fixed = np.ones(shape=np.shape(h), dtype=bool)
+        h_mask_fixed[[0, 1], :] = False
+        # Then we generate the DataFrame that must have the names
+        # (index, columns)
+        h_mask_fixed_df = pd.DataFrame(data=np.nan_to_num(h_mask_fixed,
+                                                          nan=-1),
+                                       index=row_names,
+                                       columns=column_names)
+
+        h_new = self.dec._proportion_constraint_h(h=h,
+                                                  h_mask_fixed=h_mask_fixed_df)
+
+        # Now we test if the first rows are 1 deleting the unknown one
+        prop_columns = h_new[[0, 1], :].sum(axis=0)
+        self.assertTrue(np.all(np.round(prop_columns, 3) == 1.0),
+                        'All known variables sum up 1 for k=2.')
+
     def test_calculate_divergence_equal_matrix(self):
         k = 4
         w = np.array(np.random.rand(10, k))
@@ -251,11 +309,43 @@ class test_NMMFlex_basics(unittest.TestCase):
         # quantile_normalization_min_max
         check_results_quantile_normalization_min_max = np.all(
             (matrix_quantile_normalization_min_max >= 0 &
-            (matrix_quantile_normalization_min_max <= 1)))
+             (matrix_quantile_normalization_min_max <= 1)))
 
         self.assertTrue(check_results_quantile_normalization_min_max,
                         'The matrix was not quantile_normalization_min_max '
                         'normalized.')
+
+    def test_division_zero(self):
+        result = self.dec.division(x=1, y=0)
+
+        self.assertEqual(result, 0, 'Division by zero result in zero.')
+
+    def test_scale_multiple_contrasts(self):
+        # Suppose this is your matrix
+        matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+
+        normal_zero_one_matrix = self.dec.scale_matrix(matrix, 'zero_one')
+        sigmoid_matrix = self.dec.scale_matrix(matrix, 'sigmoid')
+        power_matrix_75 = self.dec.scale_matrix(matrix, 'power', value=0.75)
+        power_matrix_50 = self.dec.scale_matrix(matrix, 'power', value=0.50)
+        power_matrix_25 = self.dec.scale_matrix(matrix, 'power', value=0.25)
+        exp_matrix = self.dec.scale_matrix(matrix, 'exp')
+
+        self.assertTrue((np.all(np.round(normal_zero_one_matrix, 3) <= 1.0) and
+                        np.all(np.round(normal_zero_one_matrix, 3) >= 0.0)),
+                        'Scaled matrix between 0 and 1')
+
+        self.assertTrue((np.all(np.round(sigmoid_matrix, 3) <= 1.0) and
+                        np.all(np.round(sigmoid_matrix, 3) >= 0.0)),
+                        'Scaled sigmoid matrix between 0 and 1')
+
+        self.assertTrue((np.all(np.round(power_matrix_75, 3) <= 1.0) and
+                        np.all(np.round(power_matrix_75, 3) >= 0.0)),
+                        'Scaled power .75 matrix between 0 and 1')
+
+        self.assertTrue((np.all(np.round(exp_matrix, 3) <= 1.0) and
+                        np.all(np.round(exp_matrix, 3) >= 0.0)),
+                        'Scaled exponential matrix between 0 and 1')
 
 
 if __name__ == '__main__':

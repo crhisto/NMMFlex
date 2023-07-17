@@ -31,7 +31,9 @@ from sklearn.utils.validation import check_non_negative
 # because it seems that is not going to change the behaviour in the future and
 # my code is going to run anyway correctly.
 import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
 
 # Code created based on the pep-0008: https://www.python.org/dev/peps/pep-0008/
 # TODO: Check constraints for the entire set of matrices in the multiple
@@ -251,6 +253,10 @@ class factorization:
                                    w_mask_fixed=None,
                                    h_mask_fixed=None,
                                    batches_partial_fixed=1,
+                                   constraint_type_w=None,
+                                   constraint_value_w=None,
+                                   constraint_type_a=None,
+                                   constraint_value_a=None,
                                    verbose=True):
         """
         Function that runs the src with three matrices as input. You can
@@ -323,6 +329,25 @@ class factorization:
             batches_partial_fixed (int, optional): Defines the number of
                 batches where the procedure will inject again the partially
                 fixed matrices. Defaults to 1.
+            constraint_type_w : str, optional
+                Type of constraint to apply to the w Matrix during
+                deconvolution depending on the data used.
+                Possible values are: ' ', 'power', 'exp', 'zero_one', or
+                None. If None, no constraint is applied.
+            constraint_value_w : float or None, optional
+                The value to use for the constraint on the w Matrix.
+                If None and constraint_type_w is not None, a default value will
+                 be used.
+            constraint_type_a : str, optional
+                Type of constraint to apply to the A Matrix during
+                deconvolution depending on the data used.
+                Possible values are: 'sigmoid', 'power', 'exp', 'zero_one', or
+                None.
+                If None, no constraint is applied.
+            constraint_value_a : float or None, optional
+                The value to use for the constraint on the A Matrix.
+                If None and constraint_type_a is not None, a default value
+                will be used.
             verbose (bool, optional): Whether to display progress messages
                 during deconvolution. Default is True.
 
@@ -518,10 +543,15 @@ class factorization:
         #                                                fixed_a=fixed_a,
         #                                                fixed_b=fixed_b,
         #                                                gamma=gamma,
-        #                                                alpha=alpha, beta=beta)
+        #                                                alpha=alpha,
+        #                                                beta=beta)
 
         print("Values of parameters: gamma: ", str(gamma), ', alpha: ',
-              str(alpha), ', beta: ', str(beta))
+              str(alpha), ', beta: ', str(beta),
+              ', constraint_type_w: ', constraint_type_w,
+              ', constraint_value_w: ', constraint_value_w,
+              ', constraint_type_a: ', constraint_type_a,
+              ', constraint_value_a: ', constraint_value_a)
 
         # Creating the dynamic variables with the correct sizing.
         x_hat = np.zeros(shape=(np.shape(x)))
@@ -601,24 +631,29 @@ class factorization:
                     h_new = self._calculate_h_new_extended_alpha_beta_generic(
                         x, x_hat, w, h, alpha,
                         y, y_hat, a, proportion_constraint_h,
-                        self.is_model_sparse)
+                        self.is_model_sparse,
+                        h_mask_fixed)
                 # I will calculate the new A matrix if there is not fixed
                 # matrix.
                 if fixed_a is None:
                     a_new = self._calculate_a_new_extended_generic(
-                        y, y_hat, a, h, self.is_model_sparse)
+                        y, y_hat, a, h, self.is_model_sparse,
+                        constraint_type_a, constraint_value_a)
                     a = a_new
             elif fixed_h is None:
                 h_new = self._calculate_h_new_extended_alpha_beta_generic(
                     x, x_hat, w, h, alpha, None, None, None,
-                    proportion_constraint_h, self.is_model_sparse)
+                    proportion_constraint_h, self.is_model_sparse,
+                    h_mask_fixed)
 
             if beta != 0:
                 # Calculate the new values for the w and h matrices
                 if fixed_w is None:
                     w_new = self._calculate_w_new_extended_alpha_beta_generic(
                         x, x_hat, w, h, beta, z, z_hat, b, regularize_w,
-                        alpha_regularizer_w, self.is_model_sparse)
+                        alpha_regularizer_w, self.is_model_sparse,
+                        constraint_type_w, constraint_value_w
+                    )
 
                 if fixed_b is None:
                     b_new = self._calculate_b_new_extended_generic(
@@ -627,7 +662,9 @@ class factorization:
             elif fixed_w is None:
                 w_new = self._calculate_w_new_extended_alpha_beta_generic(
                     x, x_hat, w, h, beta, None, None, None, regularize_w,
-                    alpha_regularizer_w, self.is_model_sparse)
+                    alpha_regularizer_w, self.is_model_sparse,
+                    constraint_type_w, constraint_value_w
+                )
 
             # Assign the new values to the original variables w and h if there
             # is none fixed matrix
@@ -671,9 +708,11 @@ class factorization:
                   delta_divergence_value)
 
         # Call the function to save the  variables globally.
-        self._assign_global_variables\
+        self._assign_global_variables \
             (fixed_w=fixed_w, fixed_h=fixed_h,
              fixed_a=fixed_a, fixed_b=fixed_b,
+             partial_w_fixed=partial_w_fixed,
+             partial_h_fixed=partial_h_fixed,
              x=x_matrix, y=y_matrix, z=z_matrix,
              x_hat=x_hat, y_hat=y_hat, z_hat=z_hat,
              w_new=w_new, h_new=h_new, a_new=a_new,
@@ -687,6 +726,7 @@ class factorization:
         return self
 
     def _assign_global_variables(self, fixed_w, fixed_h, fixed_a, fixed_b,
+                                 partial_w_fixed, partial_h_fixed,
                                  x, y, z, x_hat, y_hat, z_hat, w_new, h_new,
                                  a_new, b_new, running_info, alpha, beta, k,
                                  iterations, divergence_value,
@@ -700,6 +740,9 @@ class factorization:
 
             fixed_w, fixed_h, fixed_a, fixed_b (type): These are flags
                 indicating whether the respective matrices are fixed.
+            partial_w_fixed, partial_w_fixed (np.ndarray, optional): The
+                partial fixed matrix for H and W. If None, no fixed matrix for
+                 H and W is used. Defaults to None.
             x, y, z (DataFrame): Input data matrices.
             x_hat, y_hat, z_hat (DataFrame): Estimated data matrices.
             w_new, h_new, a_new, b_new (DataFrame): Newly calculated matrices
@@ -718,8 +761,14 @@ class factorization:
         """
 
         # Calculating column names depending on the fixed matrices.
-        k_values = self._calculate_k_values_labels(fixed_w, fixed_h, fixed_a,
-                                                   fixed_b, k)
+        k_values = self._calculate_k_values_labels(
+            fixed_w=fixed_w,
+            fixed_h=fixed_h,
+            fixed_a=fixed_a,
+            fixed_b=fixed_b,
+            partial_w_fixed=partial_w_fixed,
+            partial_h_fixed=partial_h_fixed,
+            k=k)
 
         self.x = pd.DataFrame(x)
         self.y = pd.DataFrame(y)
@@ -773,6 +822,7 @@ class factorization:
 
     # TODO: Implement unit tests for the _calculate_k_values_labels function.
     def _calculate_k_values_labels(self, fixed_w, fixed_h, fixed_a, fixed_b,
+                                   partial_w_fixed, partial_h_fixed,
                                    k):
         """
         This function calculates the labels for the k-values, which are based
@@ -805,6 +855,12 @@ class factorization:
             fixed_h (pd.DataFrame): Fixed H matrix with labels.
             fixed_a (pd.DataFrame): Fixed A matrix with labels.
             fixed_b (pd.DataFrame): Fixed B matrix with labels.
+            partial_w_fixed (np.ndarray, optional): The partial fixed matrix
+                for W. If None, no fixed matrix for W is used. Defaults to
+                None.
+            partial_h_fixed (np.ndarray, optional): The partial fixed matrix
+                for H. If None, no fixed matrix for H is used. Defaults to
+                None.
             k (int): The number of ranks for which labels need to be generated
                 when no fixed matrix is provided.
 
@@ -817,15 +873,16 @@ class factorization:
 
         k_values = []
         if fixed_w is None and fixed_h is None and fixed_h is None and \
-                fixed_a is None and fixed_b is None:
-            print("There aren't fixed matrices")
+                fixed_a is None and fixed_b is None and \
+                partial_w_fixed is None and partial_h_fixed is None:
+            print("There aren't fixed matrices...")
             # Creation of vector for the k ranks
             for k in range(k):
                 current_string = 'rank_' + str(k)
                 k_values = np.append(k_values, np.array([current_string]),
                                      axis=0)
         else:
-            print("There is at least one fixed matrix.")
+            print("There is at least one fixed matrix...")
             if fixed_w is not None:
                 k_values = fixed_w.columns.values
             elif fixed_a is not None:
@@ -834,10 +891,14 @@ class factorization:
                 k_values = fixed_h.index.values
             elif fixed_b is not None:
                 k_values = fixed_b.index.values
+            elif partial_w_fixed is not None:
+                k_values = partial_w_fixed.columns.values
+            elif partial_h_fixed is not None:
+                k_values = partial_h_fixed.index.values
 
         return k_values
 
-    def _proportion_constraint_h(self, h):
+    def _proportion_constraint_h(self, h, h_mask_fixed=None):
         """
         This function calculates the proportion of each element in the input
         matrix 'h' along the columns. Each value in 'h' is divided by the sum
@@ -849,6 +910,9 @@ class factorization:
 
             h (pd.DataFrame or np.ndarray): Input matrix. Elements should be
                 numeric.
+            h_mask_fixed (np.ndarray, optional): A mask matrix for H defining
+                the positions that are fixed with TRUE values. If None, no
+                mask is applied. Defaults to None.
 
         Returns:
 
@@ -857,7 +921,45 @@ class factorization:
                 sum of its column.
         """
 
-        h_proportions = h / h.sum(axis=0)
+        h_proportions = None
+
+        if h_mask_fixed is None:
+            h_proportions = h / h.sum(axis=0)
+        else:
+
+            # 0. Check which rows are the fixed ones (TRUE rows)
+            unknown_cell_type_name = []
+            for rows_mask in h_mask_fixed.index:
+                index = h_mask_fixed.index.get_loc(rows_mask)
+                if np.all(h_mask_fixed.iloc[index, :]):
+                    unknown_cell_type_name.append(rows_mask)
+
+            # Since the h is a np.array, I will convert it to df
+            h_df = pd.DataFrame(data=h,
+                                index=h_mask_fixed.index,
+                                columns=h_mask_fixed.columns)
+
+            # 1. get the limited part of the data in H that I want to re-scale.
+            h_temp = h_df.drop(unknown_cell_type_name)
+
+            # 2. Scale the data
+            h_proportions_temp = h_temp / h_temp.sum(axis=0)
+
+            # 3. Create the mask with all true
+            mask_without_unknown = np.ones(np.shape(h), dtype=bool)
+
+            # 4. Now I will take the index for each unknown row
+            unknown_index = []
+            for unknown_counter in unknown_cell_type_name:
+                unknown_index.append(h_df.index.get_loc(unknown_counter))
+
+            mask_without_unknown[unknown_index, :] = False
+            h_proportions = h
+
+            # 5. Reassign the data to the H matrix
+            np.putmask(h_proportions, mask_without_unknown,
+                       h_proportions_temp)
+
         return h_proportions
 
     def _calculate_x_hat(self, w, h):
@@ -1021,13 +1123,14 @@ class factorization:
                 #  data. Add the necessary constraints.
                 up_temp = 0
                 for j in range(np.shape(h)[1]):
-                    up_temp = up_temp + (x[i][j] / x_hat[i][j]) * h[k][j]
+                    up_temp = up_temp + self.division(x[i][j],
+                                                      x_hat[i][j]) * h[k][j]
 
                 down_temp = 0
                 for j in range(np.shape(h)[1]):
                     down_temp = down_temp + h[k][j]
 
-                w_new[i][k] = w[i][k] * (up_temp / down_temp)
+                w_new[i][k] = w[i][k] * self.division(up_temp, down_temp)
 
         return w_new
 
@@ -1035,7 +1138,9 @@ class factorization:
                                                      beta, z, z_hat, b,
                                                      regularize_w,
                                                      alpha_regularizer_w=0,
-                                                     is_sparse=False):
+                                                     is_sparse=False,
+                                                     constraint_type_w=None,
+                                                     constraint_value_w=None):
         """
         This function calculates a new 'w' matrix using a generic variant of an
         extended update rule that could be applied in algorithms such as
@@ -1076,6 +1181,15 @@ class factorization:
             regularize_w (Any): The regularization parameter for the 'w' matrix
             alpha_regularizer_w (float, optional): The alpha regularization
                 parameter for the 'w' matrix. Default is 0.
+            constraint_type_w : str, optional
+                Type of constraint to apply to the W Matrix during
+                deconvolution depending on the data used.
+                Possible values are: 'sigmoid', 'power', 'exp', 'zero_one', or
+                None. If None, no constraint is applied.
+            constraint_value_w : float or None, optional
+                The value to use for the constraint on the W Matrix.
+                If None and constraint_type_w is not None, a default value will
+                be used.
             is_sparse (bool, optional): A flag to determine whether to perform
                 the sparse or regular computation. Default is False.
 
@@ -1099,6 +1213,13 @@ class factorization:
             w_new = self._calculate_w_new_extended_alpha_beta(
                 x, x_hat, w, h, beta, z, z_hat,
                 b, regularize_w, alpha_regularizer_w)
+
+        # Checking if there is a constraint for the W
+        if constraint_type_w is not None:
+            w_new_scaled = self.scale_matrix(matrix=w_new,
+                                             scale_type=constraint_type_w,
+                                             value=constraint_value_w)
+            w_new = w_new_scaled
 
         return w_new
 
@@ -1169,7 +1290,8 @@ class factorization:
                 up_temp_first = 0
                 for j in range(np.shape(h)[1]):
                     up_temp_first = up_temp_first + \
-                                    (x[i][j] / x_hat[i][j]) * h[k][j]
+                                    self.division(x[i][j],
+                                                  x_hat[i][j]) * h[k][j]
 
                 # If running a simple NMF with beta=0, skip executing this
                 # code.
@@ -1180,7 +1302,8 @@ class factorization:
                         # (Takeuchi et al, 2013) has an issue where i and k are
                         # reversed, which seems incorrect.
                         up_temp_second = up_temp_second + \
-                                         (z[i][m] / z_hat[i][m]) * b[k][m]
+                                         self.division(z[i][m],
+                                                       z_hat[i][m]) * b[k][m]
 
                 up_temp = up_temp_first + (beta * up_temp_second)
 
@@ -1209,14 +1332,14 @@ class factorization:
                             'medecom_soft_binary_derived':
                         # Derived regularizator from MeDeCom: based on
                         # the function x(1-x)
-                        regularization_part = alpha_regularizer_w *\
+                        regularization_part = alpha_regularizer_w * \
                                               (1 - 2 * w[i][k])
 
                 down_temp = down_temp_first + \
                             (beta * down_temp_second) + \
                             regularization_part
 
-                w_new[i][k] = w[i][k] * (up_temp / down_temp)
+                w_new[i][k] = w[i][k] * self.division(up_temp, down_temp)
 
         if regularize_w is not None:
             w_new = self._regularize_w(w_new, regularization_type=regularize_w)
@@ -1298,7 +1421,7 @@ class factorization:
                     up_temp_first_complement = (x[i, j] /
                                                 x_hat[i][j]) * h[k][j]
                     if not math.isnan(up_temp_first_complement):
-                        up_temp_first = up_temp_first +\
+                        up_temp_first = up_temp_first + \
                                         up_temp_first_complement
 
                 # In case that we are running a simple NMF with beta=0
@@ -1309,8 +1432,9 @@ class factorization:
                         # Verify the equation in this part. The original paper
                         # (Takeuchi et al, 2013) has an issue where i and k are
                         # reversed, which seems incorrect.
-                        up_temp_second_complement = (z[i, m] / z_hat[i][m]) *\
-                                                    b[k][m]
+                        up_temp_second_complement = self.division(
+                            z[i, m], z_hat[i][m]) * b[k][m]
+
                         if not math.isnan(up_temp_second_complement):
                             up_temp_second = up_temp_second + \
                                              up_temp_second_complement
@@ -1339,7 +1463,7 @@ class factorization:
                     elif regularizer_function_type == 'medecom_soft_binary':
                         # Direct regularizator from MeDeCom
                         if not math.isnan(w[i][k]):
-                            regularization_part = alpha_regularizer_w *\
+                            regularization_part = alpha_regularizer_w * \
                                                   (w[i][k] * (1 - w[i][k]))
                     elif regularizer_function_type == \
                             'medecom_soft_binary_derived':
@@ -1354,7 +1478,7 @@ class factorization:
                             regularization_part
 
                 if not math.isnan(w[i][k]):
-                    w_new[i][k] = w[i][k] * (up_temp / down_temp)
+                    w_new[i][k] = w[i][k] * self.division(up_temp, down_temp)
 
         if regularize_w is not None:
             # TODO: Test the _regularize_w function with sparse values to
@@ -1448,7 +1572,7 @@ class factorization:
         elif normalization_type == "centered":
             normalized_matrix = (matrix - matrix.mean()) / matrix.std()
         elif normalization_type == "norm_zero_min_max":
-            normalized_matrix = (matrix - matrix.min()) /\
+            normalized_matrix = (matrix - matrix.min()) / \
                                 (matrix.max() - matrix.min())
         elif normalization_type == "centered_norm_zero_min_max":
             normalized_matrix_temp = self.normalization(matrix, "centered")
@@ -1582,7 +1706,7 @@ class factorization:
                                  columns=df.columns)
         df_mean = df_sorted.mean(axis=1)
         df_mean.index = np.arange(1, len(df_mean) + 1)
-        df_qn = df.rank(method="min").stack().astype(int).\
+        df_qn = df.rank(method="min").stack().astype(int). \
             map(df_mean).unstack()
         return df_qn
 
@@ -1631,23 +1755,26 @@ class factorization:
 
                 up_temp = 0
                 for i in range(np.shape(x)[0]):
-                    up_temp = up_temp + (x[i][j] / x_hat[i][j]) * w[i][k]
+                    up_temp = up_temp + self.division(x[i][j],
+                                                      x_hat[i][j]) * w[i][k]
 
                 down_temp = 0
                 for i in range(np.shape(w)[0]):
                     down_temp = down_temp + w[i][k]
 
-                h_new[k][j] = h[k][j] * (up_temp / down_temp)
+                h_new[k][j] = h[k][j] * self.division(up_temp, down_temp)
 
         if proportion_constraint:
-            h_new = self._proportion_constraint_h(h_new)
+            # I will send None for h_mask_fixed to have compatibility with
+            # the old version.
+            h_new = self._proportion_constraint_h(h=h_new, h_mask_fixed=None)
 
         return h_new
 
     def _calculate_h_new_extended_alpha_beta_generic(self, x, x_hat, w, h,
                                                      alpha, y, y_hat, a,
                                                      proportion_constraint,
-                                                     is_sparse):
+                                                     is_sparse, h_mask_fixed):
         """
         This function calculates an updated version of the matrix 'h'
         considering an additional constraint on 'alpha' and potentially dealing
@@ -1670,6 +1797,9 @@ class factorization:
                 proportion constraint should be applied to the new 'h'.
             is_sparse (bool): A flag indicating whether the input matrices are
                 sparse.
+            h_mask_fixed (np.ndarray, optional): A mask matrix for H defining
+                the positions that are fixed with TRUE values. If None, no
+                mask is applied. Defaults to None.
 
         Returns:
             h_new (np.ndarray): The updated version of the 'h' matrix.
@@ -1706,7 +1836,8 @@ class factorization:
 
         # If I need to calculate proportions I will do with the final H matrix
         if proportion_constraint:
-            h_new = self._proportion_constraint_h(h_new)
+            h_new = self._proportion_constraint_h(h=h_new,
+                                                  h_mask_fixed=h_mask_fixed)
 
         return h_new
 
@@ -1762,14 +1893,16 @@ class factorization:
                 up_temp_first = 0
                 for i in range(np.shape(x)[0]):
                     up_temp_first = up_temp_first + \
-                                    (x[i][j] / x_hat[i][j]) * w[i][k]
+                                    (self.division(x[i][j],
+                                                   x_hat[i][j])) * w[i][k]
 
                 # Avoid the calculation if running a simple model.
                 up_temp_second = 0
                 if alpha != 0:
                     for n in range(np.shape(y)[0]):
-                        up_temp_second = up_temp_second +\
-                                         (y[n][j] / y_hat[n][j]) * a[n][k]
+                        up_temp_second = up_temp_second + \
+                                         self.division(y[n][j],
+                                                       y_hat[n][j]) * a[n][k]
 
                 up_temp = up_temp_first + (alpha * up_temp_second)
 
@@ -1785,7 +1918,7 @@ class factorization:
 
                 down_temp = down_temp_first + (alpha * down_temp_second)
 
-                h_new[k][j] = h[k][j] * (up_temp / down_temp)
+                h_new[k][j] = h[k][j] * (self.division(up_temp, down_temp))
 
         return h_new
 
@@ -1862,10 +1995,11 @@ class factorization:
                 if alpha != 0:
                     for n in range(np.shape(y)[0]):
                         # If the complementary part is not NaN
-                        up_temp_second_complement = (y[n, j] / y_hat[n][j]) *\
-                                                    a[n][k]
+                        up_temp_second_complement = self.division(
+                            y[n, j], y_hat[n][j]) * a[n][k]
+
                         if not math.isnan(up_temp_second_complement):
-                            up_temp_second = up_temp_second +\
+                            up_temp_second = up_temp_second + \
                                              up_temp_second_complement
 
                 up_temp = up_temp_first + (alpha * up_temp_second)
@@ -1888,45 +2022,51 @@ class factorization:
 
                 if not math.isnan(h[k][j]):
                     # I sum up if the value is not null
-                    h_new[k][j] = h[k][j] * (up_temp / down_temp)
+                    h_new[k][j] = h[k][j] * self.division(up_temp, down_temp)
 
         return h_new
 
-    def _calculate_a_new_extended_generic(self, y, y_hat, a, h, is_sparse):
+    def _calculate_a_new_extended_generic(self, y, y_hat, a, h, is_sparse,
+                                          constraint_type_a=None,
+                                          constraint_value_a=None):
         """
-        This function calculates an updated version of the matrix 'h' for
-        sparse data matrices, using constraints from the 'alpha' parameter.
-        This function is used in matrix factorization techniques, where 'w'
+        This function calculates an updated version of the matrix 'a' for
+        sparse and not sparse data matrices.
+        This function is used in matrix factorization techniques, where 'a'
         and 'h' are the factor matrices.
 
         Parameters:
 
-            x (np.ndarray or csr_matrix): The original matrix that is being
+            y (np.ndarray or csr_matrix): The original matrix that is being
                 factorized.
-            x_hat (np.ndarray): The current estimate of the original matrix 'x'
-                from the product of 'w' and 'h'.
-            w (np.ndarray): The current estimate of the factor matrix 'w'.
+            y_hat (np.ndarray): The current estimate of the original matrix 'y'
+                from the product of 'a' and 'h'.
+            a (np.ndarray): The current estimate of the factor matrix 'a'.
             h (np.ndarray): The current estimate of the factor matrix 'h'.
-            alpha (float): A constraint parameter on the transformation.
-            y (np.ndarray or csr_matrix): An additional original matrix that is
-                being factorized.
-            y_hat (np.ndarray): The current estimate of the original matrix
-                'y'.
-            a (np.ndarray): The current estimate of an additional factor matrix
-                'a'.
+            is_sparse : boolean
+                A flag indicating whether the data structure is sparse or
+                standard. If True, the sparse method is used.
+            constraint_type_a : str, optional
+                Type of constraint to apply to the A Matrix during
+                deconvolution depending on the data used.
+                Possible values are: 'sigmoid', 'power', 'exp', 'zero_one', or
+                None. If None, no constraint is applied.
+            constraint_value_a : float or None, optional
+                The value to use for the constraint on the A Matrix.
+                If None and constraint_type_w is not None, a default value will
+                be used.
 
         Returns:
             h_new (np.ndarray): The updated version of the 'h' matrix.
 
         Procedure:
-            1. Initializes a new zero matrix 'h_new' of the same shape as 'h'.
-            2. Ensures that 'x' and 'y' are in the csr_matrix format for sparse
-                matrices.
-            3. For each element in 'h_new', it computes the corresponding
-                element in 'h_new' using a multiplicative update rule that is
-                based on 'x', 'x_hat', 'w', 'h', 'alpha', 'y', 'y_hat', and
-                'a'.
-            4. Returns 'h_new'.
+            1. Initializes a new zero matrix 'a_new' of the same shape as 'a'.
+            2. Ensures that 'y' and 'y_hat' are in the csr_matrix format for
+                sparse matrices.
+            3. For each element in 'a_new', it computes the corresponding
+                element in 'a_new' using a multiplicative update rule that is
+                based on 'y', 'y_hat', 'a', and 'h'
+            4. Returns 'a_new'.
 
         Note:
             The updates are based on a form of multiplicative update rule that
@@ -1941,6 +2081,13 @@ class factorization:
             a_new = self._calculate_a_new_extended_sparse(y, y_hat, a, h)
         else:
             a_new = self._calculate_a_new_extended(y, y_hat, a, h)
+
+        # Checking if there is a constraint for the A
+        if constraint_type_a is not None:
+            a_new_scaled = self.scale_matrix(matrix=a_new,
+                                             scale_type=constraint_type_a,
+                                             value=constraint_value_a)
+            a_new = a_new_scaled
 
         return a_new
 
@@ -1989,13 +2136,14 @@ class factorization:
 
                 up_temp = 0
                 for j in range(np.shape(y)[1]):
-                    up_temp = up_temp + (y[n][j] / y_hat[n][j]) * h[k][j]
+                    up_temp = up_temp + self.division(y[n][j],
+                                                      y_hat[n][j]) * h[k][j]
 
                 down_temp = 0
                 for j in range(np.shape(y)[1]):
                     down_temp = down_temp + h[k][j]
 
-                a_new[n][k] = a[n][k] * (up_temp / down_temp)
+                a_new[n][k] = a[n][k] * self.division(up_temp, down_temp)
 
         return a_new
 
@@ -2048,7 +2196,8 @@ class factorization:
 
                 up_temp = 0
                 for j in range(np.shape(y)[1]):
-                    up_temp_complement = (y[n, j] / y_hat[n][j]) * h[k][j]
+                    up_temp_complement = self.division(y[n, j],
+                                                       y_hat[n][j]) * h[k][j]
                     # If the complementary part is not NaN
                     if not math.isnan(up_temp_complement):
                         up_temp = up_temp + up_temp_complement
@@ -2061,7 +2210,7 @@ class factorization:
 
                 # I sum up if the value is not null
                 if not math.isnan(a[n][k]):
-                    a_new[n][k] = a[n][k] * (up_temp / down_temp)
+                    a_new[n][k] = a[n][k] * self.division(up_temp, down_temp)
 
         return a_new
 
@@ -2152,13 +2301,14 @@ class factorization:
 
                 up_temp = 0
                 for i in range(np.shape(z)[0]):
-                    up_temp = up_temp + (z[i][m] / z_hat[i][m]) * w[i][k]
+                    up_temp = up_temp + self.division(z[i][m],
+                                                      z_hat[i][m]) * w[i][k]
 
                 down_temp = 0
                 for i in range(np.shape(z)[0]):
                     down_temp = down_temp + w[i][k]
 
-                b_new[k][m] = b[k][m] * (up_temp / down_temp)
+                b_new[k][m] = b[k][m] * self.division(up_temp, down_temp)
 
         return b_new
 
@@ -2210,7 +2360,8 @@ class factorization:
 
                 up_temp = 0
                 for i in range(np.shape(z)[0]):
-                    up_temp_complement = (z[i, m] / z_hat[i][m]) * w[i][k]
+                    up_temp_complement = self.division(z[i, m],
+                                                       z_hat[i][m]) * w[i][k]
                     # If the complementary part is not NaN
                     if not math.isnan(up_temp_complement):
                         up_temp = up_temp + up_temp_complement
@@ -2223,7 +2374,7 @@ class factorization:
 
                 # I sum up if the value is not null
                 if not math.isnan(b[k][m]):
-                    b_new[k][m] = b[k][m] * (up_temp / down_temp)
+                    b_new[k][m] = b[k][m] * self.division(up_temp, down_temp)
 
         return b_new
 
@@ -2296,8 +2447,10 @@ class factorization:
         for i in range(np.shape(x)[0]):
             for j in range(np.shape(x)[1]):
                 divergence_matrix[i][j] = x[i][j] * \
-                                          (np.log(x[i][j] / x_hat[i][j])) -\
-                                          x[i][j] +\
+                                          (np.log(
+                                              self.division(x[i][j],
+                                                            x_hat[i][j]))) - \
+                                          x[i][j] + \
                                           x_hat[i][j]
 
         return divergence_matrix
@@ -2346,7 +2499,13 @@ class factorization:
             for j in range(np.shape(x)[1]):
                 x_ij = x[i, j]
                 x_hat_ij = x_hat[i][j]
-                divergence_complement = (np.log(x_ij / x_hat_ij))
+
+                # To avoid errors with log(0)
+                temp_internal_value = self.division(x_ij, x_hat_ij)
+                if temp_internal_value == 0:
+                    divergence_complement = 0
+                else:
+                    divergence_complement = (np.log(temp_internal_value))
 
                 # I convert all possible nan into zero.
                 if math.isnan(x_ij):
@@ -2359,9 +2518,9 @@ class factorization:
                         math.isinf(divergence_complement):
                     divergence_complement = 0
 
-                divergence_value_ij = x_ij *\
-                                      divergence_complement -\
-                                      x_ij +\
+                divergence_value_ij = x_ij * \
+                                      divergence_complement - \
+                                      x_ij + \
                                       x_hat_ij
 
                 if math.isnan(divergence_value_ij):
@@ -2614,7 +2773,7 @@ class factorization:
             sparsity_null_percentage = self.sparsity_calculation(
                 matrix, type_analysis='nulls', type_return='percentage')
 
-            description_text = 'The matrix ' + matrix_name + '. Sparsity:  ' +\
+            description_text = 'The matrix ' + matrix_name + '. Sparsity:  ' + \
                                str(sparsity_percentage) \
                                + '% - ' + 'zeros: ' + \
                                str(sparsity_zero_percentage) \
@@ -2626,7 +2785,7 @@ class factorization:
         return description_text
 
     def _check_parameters(self, x_matrix, y_matrix, z_matrix, k, alpha, beta,
-                          delta_threshold,max_iterations, print_limit,
+                          delta_threshold, max_iterations, print_limit,
                           proportion_constraint_h,
                           regularize_w, alpha_regularizer_w,
                           fixed_w, fixed_h, fixed_a, fixed_b,
@@ -2739,7 +2898,7 @@ class factorization:
             )
 
         # 4. delta_threshold
-        if not isinstance(delta_threshold, numbers.Number) or\
+        if not isinstance(delta_threshold, numbers.Number) or \
                 delta_threshold <= 0:
             raise ValueError(
                 "Delta threshold for stopping criteria must be positive and "
@@ -2982,7 +3141,7 @@ class factorization:
                     "K=" + str(k)
                 )
 
-    def _standardize_sparse_matrix(self, matrix):
+    def _standardize_sparse_matrix(self, matrix, verbose=False):
         """
         Standardizes a sparse matrix by replacing empty strings, "null", "na",
         and "NA" values with numpy's nan, and converts the matrix to a float
@@ -2990,8 +3149,11 @@ class factorization:
 
         Parameters:
         matrix : array-like
-        The sparse matrix to be standardized. The matrix is converted to a
-        numpy array for processing.
+            The sparse matrix to be standardized. The matrix is converted to a
+            numpy array for processing.
+        verbose (bool, optional): Whether to display progress messages
+            during the process of standardize the sparse matrix.
+            Default is True.
 
         Returns:
         standardized_matrix_df : DataFrame
@@ -3004,8 +3166,11 @@ class factorization:
         If the input matrix cannot be converted to float.
         """
 
-        print("Standardizing sparse matrix...", 'pd.DataFrame: ',
-              isinstance(matrix, pd.DataFrame))
+        if verbose:
+            print("Standardizing sparse matrix...", 'pd.DataFrame: ',
+                  isinstance(matrix, pd.DataFrame))
+        else:
+            print("Standardizing sparse matrix")
 
         # Let's take the original row and column names
         column_names = matrix.columns.values
@@ -3021,13 +3186,13 @@ class factorization:
         standardized_matrix = np.where(matrix != '', matrix, np.nan)
 
         # 2. replace "null" values for np.nan
-        standardized_matrix = np.where(standardized_matrix != 'null', 
+        standardized_matrix = np.where(standardized_matrix != 'null',
                                        standardized_matrix, np.nan)
 
         # 3. replace "na" or 'NA' values for np.nan
-        standardized_matrix = np.where(standardized_matrix != 'na', 
+        standardized_matrix = np.where(standardized_matrix != 'na',
                                        standardized_matrix, np.nan)
-        standardized_matrix = np.where(standardized_matrix != 'NA', 
+        standardized_matrix = np.where(standardized_matrix != 'NA',
                                        standardized_matrix, np.nan)
 
         # 4. Convert to float type
@@ -3041,8 +3206,8 @@ class factorization:
         return standardized_matrix_df.astype(float)
 
     @staticmethod
-    def check_fixed_matrices_gamma_alpha_beta(fixed_w, fixed_h, 
-                                              fixed_a, fixed_b, 
+    def check_fixed_matrices_gamma_alpha_beta(fixed_w, fixed_h,
+                                              fixed_a, fixed_b,
                                               gamma, alpha, beta):
         """
         Modifies gamma, alpha, and beta based on the given fixed matrices to 
@@ -3095,7 +3260,7 @@ class factorization:
         if fixed_w is not None and fixed_h is not None:
             # 1. Since the W and H are fixed, Gamma must be 0 to avoid the
             # calculation of the divergence(X|WH)
-            gamma = 0 #TODO Fixt this validation
+            gamma = 0  # TODO Fix this validation
             print('The Gamma variable has been changed to zero because W and H'
                   ' are fixed. The divergence(X|WH) will not'
                   ' be calculated')
@@ -3103,7 +3268,7 @@ class factorization:
         if fixed_a is not None and fixed_h is not None:
             # 2. Since the A and H are fixed, alpha must be 0 to avoid the
             # calculation of the divergence(Y|AH)
-            alpha = 0 #TODO Fixt this validation
+            alpha = 0  # TODO Fix this validation
             print('The alpha variable has been changed to zero because A and '
                   'H are fixed. The divergence(Y|AH) will not be calculated')
 
@@ -3122,3 +3287,66 @@ class factorization:
 
         return gamma, alpha, beta
 
+    @staticmethod
+    def division(x, y, default=0):
+        """
+        Perform division of two numbers with error handling for zero division.
+
+        Parameters:
+        - x (float): The numerator.
+        - y (float): The denominator.
+        - default (float): The default value that in case of error will
+            return. Default 0
+
+        Returns:
+        - float: The result of the division, or 0.0 if there is a zero
+            division error.
+        """
+        try:
+            if y == 0.0:
+                return default
+            else:
+                return x / y
+        except ZeroDivisionError:
+            return default
+
+    @staticmethod
+    def scale_matrix(matrix, scale_type, value=0.5, verbose=False):
+        transformed_matrix = None
+
+        # Find the minimum and maximum of each column
+        min_vals = np.min(matrix, axis=0)
+        max_vals = np.max(matrix, axis=0)
+
+        # Subtract the minimum and divide by the range
+        scaled_matrix = (matrix - min_vals) / (max_vals - min_vals)
+
+        if scale_type == 'sigmoid':
+            # Apply sigmoid function
+            sigmoid_matrix = 1 / (1 + np.exp(-scaled_matrix))
+            transformed_matrix = sigmoid_matrix
+        elif scale_type == 'power':
+            # Apply power transformation
+            power_matrix = np.power(scaled_matrix, value)
+            transformed_matrix = power_matrix
+        elif scale_type == 'exp':
+            # Subtract 0.5 to center the values around 0
+            centered_matrix = scaled_matrix - 0.5
+
+            # Apply exponential transformation
+            exp_matrix = np.exp(centered_matrix)
+
+            # Rescale the result back to [0, 1]
+            exp_matrix = (exp_matrix - np.min(exp_matrix, axis=0)) / (
+                        np.max(exp_matrix, axis=0) - np.min(exp_matrix,
+                                                            axis=0))
+
+            transformed_matrix = exp_matrix
+        elif scale_type == 'zero_one':
+            # Subtract the minimum and divide by the range
+            transformed_matrix = scaled_matrix
+
+        if verbose:
+            print('scale_type: ', scale_type, ', value: ', value)
+
+        return transformed_matrix
