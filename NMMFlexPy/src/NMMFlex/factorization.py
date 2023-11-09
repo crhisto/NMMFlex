@@ -18,7 +18,7 @@ import numpy
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix, lil_matrix
-from sklearn.preprocessing import quantile_transform
+from sklearn.preprocessing import quantile_transform, StandardScaler
 from sklearn.utils.validation import check_non_negative
 
 # This is related with the warning: "FutureWarning: elementwise comparison
@@ -252,6 +252,7 @@ class factorization:
                                    partial_h_fixed=None,
                                    w_mask_fixed=None,
                                    h_mask_fixed=None,
+                                   scale_w_unfixed_col=True,
                                    batches_partial_fixed=1,
                                    constraint_type_w=None,
                                    constraint_value_w=None,
@@ -326,6 +327,9 @@ class factorization:
             h_mask_fixed (np.ndarray, optional): A mask matrix for H defining
                 the positions that are fixed with TRUE values. If None, no
                 mask is applied. Defaults to None.
+            scale_w_unfixed_col (bool, optional): Whether to apply a
+                scale constraint to the unfixed columns in matrix W.
+            Default is True.
             batches_partial_fixed (int, optional): Defines the number of
                 batches where the procedure will inject again the partially
                 fixed matrices. Defaults to 1.
@@ -532,7 +536,7 @@ class factorization:
             # We know that the matrix h is now all zeros.
             # Since I received the parameter with the mask, I apply it
             np.putmask(w, w_mask_fixed, partial_w_fixed)
-            h_new = w
+            w_new = w
 
         # TODO: check this validations: for a grid_search is not working!
         # In case of some combinations of fixed matrices that get the
@@ -652,7 +656,9 @@ class factorization:
                     w_new = self._calculate_w_new_extended_alpha_beta_generic(
                         x, x_hat, w, h, beta, z, z_hat, b, regularize_w,
                         alpha_regularizer_w, self.is_model_sparse,
-                        constraint_type_w, constraint_value_w
+                        constraint_type_w, constraint_value_w,
+                        scale_w_unfixed_col=scale_w_unfixed_col,
+                        w_mask_fixed=w_mask_fixed
                     )
 
                 if fixed_b is None:
@@ -684,7 +690,7 @@ class factorization:
                     np.putmask(h, h_mask_fixed, partial_h_fixed)
 
                 if partial_w_fixed is not None and w_mask_fixed is not None:
-                    # We know that the matrix h is now all zeros.
+                    # We know that the matrix w is now all zeros.
                     # Since I received the parameter with the mask, I apply it
                     np.putmask(w, w_mask_fixed, partial_w_fixed)
 
@@ -898,7 +904,8 @@ class factorization:
 
         return k_values
 
-    def _proportion_constraint_h(self, h, h_mask_fixed=None):
+    def _proportion_constraint_h(self, h, h_mask_fixed=None,
+                                 known_proportions_constrain=False):
         """
         This function calculates the proportion of each element in the input
         matrix 'h' along the columns. Each value in 'h' is divided by the sum
@@ -922,17 +929,24 @@ class factorization:
         """
 
         h_proportions = None
-
-        if h_mask_fixed is None:
+        # This is temp, since I think always that I activate the constrain
+        # all cell-types must sum up to 1, however I leave open the
+        # possibility of summing up to 1 just the known cell-types which at
+        # the first glance doesn't make sense. In the future I will delete
+        # the extended part.
+        if not known_proportions_constrain:
             h_proportions = h / h.sum(axis=0)
         else:
 
             # 0. Check which rows are the fixed ones (TRUE rows)
             unknown_cell_type_name = []
+            known_rows_index = []
             for rows_mask in h_mask_fixed.index:
                 index = h_mask_fixed.index.get_loc(rows_mask)
                 if np.all(h_mask_fixed.iloc[index, :]):
                     unknown_cell_type_name.append(rows_mask)
+                else:
+                    known_rows_index.append(index)
 
             # Since the h is a np.array, I will convert it to df
             h_df = pd.DataFrame(data=h,
@@ -942,8 +956,11 @@ class factorization:
             # 1. get the limited part of the data in H that I want to re-scale.
             h_temp = h_df.drop(unknown_cell_type_name)
 
-            # 2. Scale the data
+            # 2. Scale the data and put it in a matrix with the same size of
+            # the target matrix, otherwise can be wrong assignments.
             h_proportions_temp = h_temp / h_temp.sum(axis=0)
+            h_proportions_complete = np.zeros(np.shape(h), dtype=float)
+            h_proportions_complete[known_rows_index, :] = h_proportions_temp
 
             # 3. Create the mask with all true
             mask_without_unknown = np.ones(np.shape(h), dtype=bool)
@@ -954,11 +971,11 @@ class factorization:
                 unknown_index.append(h_df.index.get_loc(unknown_counter))
 
             mask_without_unknown[unknown_index, :] = False
-            h_proportions = h
+            h_proportions = h.copy()
 
             # 5. Reassign the data to the H matrix
             np.putmask(h_proportions, mask_without_unknown,
-                       h_proportions_temp)
+                       h_proportions_complete)
 
         return h_proportions
 
@@ -1140,7 +1157,9 @@ class factorization:
                                                      alpha_regularizer_w=0,
                                                      is_sparse=False,
                                                      constraint_type_w=None,
-                                                     constraint_value_w=None):
+                                                     constraint_value_w=None,
+                                                     scale_w_unfixed_col=True,
+                                                     w_mask_fixed=None):
         """
         This function calculates a new 'w' matrix using a generic variant of an
         extended update rule that could be applied in algorithms such as
@@ -1192,6 +1211,12 @@ class factorization:
                 be used.
             is_sparse (bool, optional): A flag to determine whether to perform
                 the sparse or regular computation. Default is False.
+            scale_w_unfixed_col (bool, optional): Whether to apply a
+                scale constraint to the unfixed columns in matrix W.
+                Default is True.
+            w_mask_fixed (np.ndarray, optional): A mask matrix for W defining
+                the positions that are fixed with TRUE values. If None, no
+                mask is applied. Defaults to None.
 
         Returns:
 
@@ -1221,7 +1246,69 @@ class factorization:
                                              value=constraint_value_w)
             w_new = w_new_scaled
 
+        # The main idea is to scale the unknown columns without centering the
+        # the values.
+        if scale_w_unfixed_col and w_mask_fixed is not None:
+            # Assign the new scale reference to the w_new variable
+            w_new = self._reference_scale_w(w=w,
+                                            w_mask_fixed=w_mask_fixed)
         return w_new
+
+    def _reference_scale_w(self, w, w_mask_fixed):
+        # In this part there are two possibilities:
+        # 1. Complete columns for known and unknown cell-types. In this case
+        #    the algorithm works fine.
+        # 2. For known cell-types, I have extra markers that are not part of my
+        #    reference, therefore have to be opened, however Do I need to
+        #    scale those as well??? this is an open question.
+
+        # 0. Check which rows are the fixed ones (TRUE rows)
+        unknown_cell_type_name = []
+        unknown_column_index = []
+        known_cell_type_name = []
+        for columns_mask in w_mask_fixed.columns:
+            index = w_mask_fixed.columns.get_loc(columns_mask)
+            if np.all(w_mask_fixed.iloc[:, index]):
+                unknown_cell_type_name.append(columns_mask)
+                unknown_column_index.append(index)
+            else:
+                known_cell_type_name.append(columns_mask)
+
+        # Since the w is a np.array, I will convert it to df
+        w_df = pd.DataFrame(data=w,
+                            index=w_mask_fixed.index,
+                            columns=w_mask_fixed.columns)
+
+        # 1. get the limited part of the data in W that I want to
+        # re-scale: unknown
+        w_unfixed_temp = w_df.drop(known_cell_type_name, axis=1)
+
+        # 2. Scale the data  and put it in a matrix with the same size of
+        # the target matrix, otherwise can be wrong assignments.
+        scaler = StandardScaler(with_mean=False, with_std=True)
+        scaled_data_w = scaler.fit_transform(w_unfixed_temp)
+        scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
+        scaled_data_w_complete[:, unknown_column_index] = scaled_data_w
+
+        # 3. Create the mask with all true
+        mask_with_unknown = np.ones(np.shape(w), dtype=bool)
+
+        # 4. Now I will take the index for each known column
+        known_columns = []
+        for known_counter in known_cell_type_name:
+            known_columns.append(w_df.columns.get_loc(known_counter))
+
+        mask_with_unknown[:, known_columns] = False
+
+        # I add the w reference to replace in it the scaled values
+        w_reference = w.copy()
+
+        # 5. Reassign the data to the H matrix
+        np.putmask(w_reference,
+                   mask_with_unknown,
+                   scaled_data_w_complete)
+
+        return w_reference
 
     def _calculate_w_new_extended_alpha_beta(self, x, x_hat, w, h, beta,
                                              z, z_hat, b, regularize_w,
@@ -1529,8 +1616,8 @@ class factorization:
             normalization_type (str): Specifies the type of normalization to be
                 applied. Supported types include 'column_max', 'global_max',
                 'centered', 'norm_zero_min_max', 'centered_norm_zero_min_max',
-                'quantile_norm', 'quantile_norm_min_max', and
-                'quantile_transform'.
+                'quantile_norm', 'quantile_norm_min_max',
+                'quantile_transform' and, 'standard_scaler'.
 
         Returns:
 
@@ -1556,6 +1643,9 @@ class factorization:
                 quantile transform, then normalized between 0 and 1.
             - 'quantile_transform': A quantile transform is applied to the
                 matrix with n_quantiles=4. Random state is fixed to 0.
+            - 'standard_scaler': Standard scaler using StandardScaler from
+                sklearn.preprocessing. This is created initially for unknown
+                references, however can be used for the entire matrix.
 
         Note: The actual implementation of 'quantile_normalize_v2' and
         'quantile_transform' is not included in this docstring. It depends on
@@ -1588,6 +1678,9 @@ class factorization:
         elif normalization_type == "quantile_transform":
             normalized_matrix = quantile_transform(matrix, n_quantiles=4,
                                                    random_state=0, copy=True)
+        elif normalization_type == "standard_scaler":
+            scaler = StandardScaler(with_mean=False, with_std=True)
+            normalized_matrix = scaler.fit_transform(matrix)
 
         return normalized_matrix
 
@@ -3338,8 +3431,8 @@ class factorization:
 
             # Rescale the result back to [0, 1]
             exp_matrix = (exp_matrix - np.min(exp_matrix, axis=0)) / (
-                        np.max(exp_matrix, axis=0) - np.min(exp_matrix,
-                                                            axis=0))
+                    np.max(exp_matrix, axis=0) - np.min(exp_matrix,
+                                                        axis=0))
 
             transformed_matrix = exp_matrix
         elif scale_type == 'zero_one':

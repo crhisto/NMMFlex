@@ -183,7 +183,7 @@ class test_NMMFlex_basics(unittest.TestCase):
 
         # Row and column names
         column_names = ['column_1', 'column_2', 'column_3']
-        row_names = ['row_1', 'row_3', 'row_3', 'cluster_unknown']
+        row_names = ['row_1', 'row_2', 'row_3', 'cluster_unknown']
 
         # We define and np array initially
         h_mask_fixed = np.ones(shape=np.shape(h), dtype=bool)
@@ -212,7 +212,7 @@ class test_NMMFlex_basics(unittest.TestCase):
 
         # Row and column names
         column_names = ['column_1', 'column_2', 'column_3']
-        row_names = ['row_1', 'row_3', 'cluster_unknown_01', 'cluster_unknown_02']
+        row_names = ['row_1', 'row_2', 'cluster_unknown_01', 'cluster_unknown_02']
 
         # We define and np array initially
         h_mask_fixed = np.ones(shape=np.shape(h), dtype=bool)
@@ -231,6 +231,108 @@ class test_NMMFlex_basics(unittest.TestCase):
         prop_columns = h_new[[0, 1], :].sum(axis=0)
         self.assertTrue(np.all(np.round(prop_columns, 3) == 1.0),
                         'All known variables sum up 1 for k=2.')
+
+    def test_proportion_constraint_h_partial_fixed_multiple_k_semi_defined(self):
+
+        h = np.array([[0.11692266, 0.49023124, 0.03157466],
+                      [0.38518708, 0.08108722, 0.34163091],
+                      [0.11876603, 0.26641129, 0.75638277],
+                      [0.42219656, 0.17418068, 0.06863269]]).astype(float)
+
+        # Row and column names
+        column_names = ['column_1', 'column_2', 'column_3']
+        row_names = ['row_1', 'row_2', 'cluster_unknown_01',
+                     'cluster_unknown_02']
+
+        # We define and np array initially making sure that some are the one
+        # that will change or not
+        h_mask_fixed = np.ones(shape=np.shape(h), dtype=bool)
+        h_mask_fixed[0, [0, 1]] = False
+        h_mask_fixed[1, [0, 1]] = False
+
+        # Then we generate the DataFrame that must have the names
+        # (index, columns)
+        h_mask_fixed_df = pd.DataFrame(data=np.nan_to_num(h_mask_fixed,
+                                                          nan=-1),
+                                       index=row_names,
+                                       columns=column_names)
+
+        h_new = self.dec._proportion_constraint_h(h=h,
+                                                  h_mask_fixed=h_mask_fixed_df)
+
+        # Now we test if the first rows are 1 deleting the unknown one
+        prop_columns = h_new[[0, 1], :].sum(axis=0)
+        self.assertTrue(np.all(np.round(prop_columns, 3) == 1.0),
+                        'All known variables sum up 1 for k=2.')
+
+    def test_reference_scale_w_partial_fixed(self):
+
+        # Row and column names
+        column_names = ['column_1', 'column_2', 'unknown_1']
+        row_names = ['row_1', 'row_2', 'row_3', 'row_4']
+
+        # The idea is to fix the first two columns
+        w = np.array([[0.11692266, 0.49023124, 0.03157466],
+                      [0.38518708, 0.08108722, 0.34163091],
+                      [0.11876603, 0.26641129, 0.75638277],
+                      [0.42219656, 0.17418068, 0.06863269]]).astype(float)
+
+        w_df = pd.DataFrame(data=np.nan_to_num(w, nan=-1),
+                            index=row_names,
+                            columns=column_names)
+
+        # We define and np array initially
+        w_mask_fixed = np.ones(shape=np.shape(w_df), dtype=bool)
+        w_mask_fixed[:, [0, 1]] = False
+        # Then we generate the DataFrame that must have the names
+        # (index, columns)
+        w_mask_fixed_df = pd.DataFrame(data=np.nan_to_num(w_mask_fixed,
+                                                          nan=-1),
+                                       index=row_names,
+                                       columns=column_names)
+
+        w_new = self.dec._reference_scale_w(w=w,
+                                            w_mask_fixed=w_mask_fixed_df)
+
+        # Now we test if the first rows are 1 deleting the unknown one
+        mean_columns = w_new[:, [2]].mean(axis=0)
+        self.assertTrue(np.all(w_new[:, [2]] > 0) and
+                        np.round(mean_columns, 3) == 1.034,
+                        'All unknown variables are greater than zero and... ')
+
+    def test_reference_scale_w_partial_fixed_multiple(self):
+        # Row and column names
+        column_names = ['column_1', 'unknown_2', 'unknown_1']
+        row_names = ['row_1', 'row_2', 'row_3', 'row_4']
+
+        # The idea is to fix the first two columns
+        w = np.array([[0.11692266, 0.49023124, 0.03157466],
+                      [0.38518708, 0.08108722, 0.34163091],
+                      [0.11876603, 0.26641129, 0.75638277],
+                      [0.42219656, 0.17418068, 0.06863269]]).astype(float)
+
+        w_df = pd.DataFrame(data=np.nan_to_num(w, nan=-1),
+                            index=row_names,
+                            columns=column_names)
+
+        # We define and np array initially
+        w_mask_fixed = np.ones(shape=np.shape(w_df), dtype=bool)
+        w_mask_fixed[:, [0]] = False
+        # Then we generate the DataFrame that must have the names
+        # (index, columns)
+        w_mask_fixed_df = pd.DataFrame(data=np.nan_to_num(w_mask_fixed,
+                                                          nan=-1),
+                                       index=row_names,
+                                       columns=column_names)
+
+        w_new = self.dec._reference_scale_w(w=w,
+                                            w_mask_fixed=w_mask_fixed_df)
+
+        # Now we test if the first rows are 1 deleting the unknown one
+        mean_columns = w_new[:, [1,2]].mean(axis=0)
+        self.assertTrue(np.all(w_new[:, [2]] > 0) and
+                        np.all(np.round(mean_columns, 3) == [1.666, 1.034]),
+                        'All unknown variables are greater than zero and... ')
 
     def test_calculate_divergence_equal_matrix(self):
         k = 4
@@ -313,6 +415,27 @@ class test_NMMFlex_basics(unittest.TestCase):
 
         self.assertTrue(check_results_quantile_normalization_min_max,
                         'The matrix was not quantile_normalization_min_max '
+                        'normalized.')
+
+    def test_normalization_standard_scale(self):
+
+        matrix_standard_scale = self.dec.normalization(
+            matrix=self.bulk_methylation_matrix.values,
+            normalization_type='standard_scaler')
+        scaled_features_df = pd.DataFrame(
+            matrix_standard_scale,
+            index=self.bulk_methylation_matrix.index,
+            columns=self.bulk_methylation_matrix.columns)
+
+        # standard scale
+        check_results_standard_scale = np.all(
+            (scaled_features_df >= 0))
+
+        print(self.bulk_methylation_matrix)
+        print(matrix_standard_scale)
+
+        self.assertTrue(check_results_standard_scale,
+                        'The matrix was not standard scale '
                         'normalized.')
 
     def test_division_zero(self):
