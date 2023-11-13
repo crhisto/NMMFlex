@@ -296,8 +296,10 @@ class test_NMMFlex_basics(unittest.TestCase):
 
         # Now we test if the first rows are 1 deleting the unknown one
         mean_columns = w_new[:, [2]].mean(axis=0)
+        std_columns = np.std(w_new[:, [2]])
         self.assertTrue(np.all(w_new[:, [2]] > 0) and
-                        np.round(mean_columns, 3) == 1.034,
+                        np.round(mean_columns, 3) == 1.034 and
+                        std_columns == 1.0,
                         'All unknown variables are greater than zero and... ')
 
     def test_reference_scale_w_partial_fixed_multiple(self):
@@ -329,9 +331,12 @@ class test_NMMFlex_basics(unittest.TestCase):
                                             w_mask_fixed=w_mask_fixed_df)
 
         # Now we test if the first rows are 1 deleting the unknown one
-        mean_columns = w_new[:, [1,2]].mean(axis=0)
-        self.assertTrue(np.all(w_new[:, [2]] > 0) and
-                        np.all(np.round(mean_columns, 3) == [1.666, 1.034]),
+        mean_columns = w_new[:, [1, 2]].mean(axis=0)
+        std_first_column = np.std(w_new[:, 1])
+        std_second_column = np.std(w_new[:, 2])
+        self.assertTrue(np.all(w_new[:, [1,2]] > 0) and
+                        std_first_column == 1.0 and
+                        std_second_column == 1.0,
                         'All unknown variables are greater than zero and... ')
 
     def test_calculate_divergence_equal_matrix(self):

@@ -1312,11 +1312,11 @@ class factorization:
             scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
             scaled_data_w_complete[:, unknown_column_index] = scaled_data_w
         else:
-            scaled_data_w = preprocessing.scale(w_unfixed_temp, axis=1,
+            scaled_data_w = preprocessing.scale(w_unfixed_temp, axis=0,
                                                 with_mean=False, with_std=True)
             scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
             scaled_data_w_complete[:, unknown_column_index] = scaled_data_w
-            print('std: ', np.std(scaled_data_w))
+            print('std: ', np.std(scaled_data_w, axis=0))
 
         # 3. Create the mask with all true
         mask_with_unknown = np.ones(np.shape(w), dtype=bool)
