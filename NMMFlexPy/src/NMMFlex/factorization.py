@@ -397,6 +397,7 @@ class factorization:
                 displayed during deconvolution.
 
         """
+        print(__version__)
         # 1. Now It's time to convert the matrices in a format where Zero and
         # null values are treated differently.
         if x_matrix is not None:
