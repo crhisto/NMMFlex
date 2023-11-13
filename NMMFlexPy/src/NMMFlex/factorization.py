@@ -545,6 +545,8 @@ class factorization:
                 columns=partial_w_fixed.columns)
             partial_w_fixed = partial_w_fixed_scaled_df
 
+            print('Fixing w first time...')
+
             # We know that the matrix h is now all zeros.
             # Since I received the parameter with the mask, I apply it
             np.putmask(w, w_mask_fixed, partial_w_fixed)
@@ -716,6 +718,7 @@ class factorization:
                         columns=partial_w_fixed.columns)
                     partial_w_fixed = partial_w_fixed_scaled_df
 
+                    print('Fixing w second time...')
                     # We know that the matrix w is now all zeros.
                     # Since I received the parameter with the mask, I apply it
                     np.putmask(w, w_mask_fixed, partial_w_fixed)
