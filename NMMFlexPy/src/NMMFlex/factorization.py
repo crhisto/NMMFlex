@@ -7,7 +7,7 @@
 #         Kimura, and Hiroshi Sawada
 # License: Released under GNU Public License (GPL)
 
-__version__ = '0.1.6'
+__version__ = '0.1.7'
 __author__ = 'Crhistian Cardona <crhisto@gmail.com>'
 
 import math
@@ -545,7 +545,7 @@ class factorization:
                 columns=partial_w_fixed.columns)
             partial_w_fixed = partial_w_fixed_scaled_df
 
-            print('Fixing w first time...')
+            print('Fixing w with scale function')
 
             # We know that the matrix h is now all zeros.
             # Since I received the parameter with the mask, I apply it
@@ -706,19 +706,6 @@ class factorization:
                     np.putmask(h, h_mask_fixed, partial_h_fixed)
 
                 if partial_w_fixed is not None and w_mask_fixed is not None:
-                    # First I will scale w_mask_fixed
-                    scaler = StandardScaler(with_mean=False, with_std=True)
-                    partial_w_fixed_scaled = scaler.fit_transform(
-                        partial_w_fixed)
-
-                    # Convert to df
-                    partial_w_fixed_scaled_df = pd.DataFrame(
-                        partial_w_fixed_scaled,
-                        index=partial_w_fixed.index,
-                        columns=partial_w_fixed.columns)
-                    partial_w_fixed = partial_w_fixed_scaled_df
-
-                    print('Fixing w second time...')
                     # We know that the matrix w is now all zeros.
                     # Since I received the parameter with the mask, I apply it
                     np.putmask(w, w_mask_fixed, partial_w_fixed)
