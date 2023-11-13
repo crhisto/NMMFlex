@@ -534,6 +534,11 @@ class factorization:
             h_new = h
 
         if partial_w_fixed is not None and w_mask_fixed is not None:
+            # First I will scale w_mask_fixed
+            scaler = StandardScaler(with_mean=False, with_std=True)
+            partial_w_fixed_scaled = scaler.fit_transform(partial_w_fixed)
+            partial_w_fixed[:, :] = partial_w_fixed_scaled
+
             # We know that the matrix h is now all zeros.
             # Since I received the parameter with the mask, I apply it
             np.putmask(w, w_mask_fixed, partial_w_fixed)
@@ -1270,6 +1275,7 @@ class factorization:
         unknown_cell_type_name = []
         unknown_column_index = []
         known_cell_type_name = []
+        known_column_index = []
         for columns_mask in w_mask_fixed.columns:
             index = w_mask_fixed.columns.get_loc(columns_mask)
             if np.all(w_mask_fixed.iloc[:, index]):
@@ -1277,6 +1283,7 @@ class factorization:
                 unknown_column_index.append(index)
             else:
                 known_cell_type_name.append(columns_mask)
+                known_column_index.append(index)
 
         # Since the w is a np.array, I will convert it to df
         w_df = pd.DataFrame(data=w,
