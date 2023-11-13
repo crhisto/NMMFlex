@@ -7,7 +7,7 @@
 #         Kimura, and Hiroshi Sawada
 # License: Released under GNU Public License (GPL)
 
-__version__ = '0.1.8'
+__version__ = '0.1.9'
 __author__ = 'Crhistian Cardona <crhisto@gmail.com>'
 
 import math
@@ -1312,7 +1312,7 @@ class factorization:
             scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
             scaled_data_w_complete[:, unknown_column_index] = scaled_data_w
         else:
-            scaled_data_w = preprocessing.scale(w_unfixed_temp, axis=0,
+            scaled_data_w = preprocessing.scale(w_unfixed_temp, axis=1,
                                                 with_mean=False, with_std=True)
             scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
             scaled_data_w_complete[:, unknown_column_index] = scaled_data_w
