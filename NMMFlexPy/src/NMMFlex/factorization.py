@@ -7,7 +7,7 @@
 #         Kimura, and Hiroshi Sawada
 # License: Released under GNU Public License (GPL)
 
-__version__ = '0.1.7'
+__version__ = '0.1.8'
 __author__ = 'Crhistian Cardona <crhisto@gmail.com>'
 
 import math
@@ -18,6 +18,7 @@ import numpy
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix, lil_matrix
+from sklearn import preprocessing
 from sklearn.preprocessing import quantile_transform, StandardScaler
 from sklearn.utils.validation import check_non_negative
 
@@ -1304,10 +1305,18 @@ class factorization:
 
         # 2. Scale the data  and put it in a matrix with the same size of
         # the target matrix, otherwise can be wrong assignments.
-        scaler = StandardScaler(with_mean=False, with_std=True)
-        scaled_data_w = scaler.fit_transform(w_unfixed_temp)
-        scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
-        scaled_data_w_complete[:, unknown_column_index] = scaled_data_w
+        version_scale = '2'
+        if version_scale == '1':
+            scaler = StandardScaler(with_mean=False, with_std=True)
+            scaled_data_w = scaler.fit_transform(w_unfixed_temp)
+            scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
+            scaled_data_w_complete[:, unknown_column_index] = scaled_data_w
+        else:
+            scaled_data_w = preprocessing.scale(w_unfixed_temp, axis=0,
+                                                with_mean=False, with_std=True)
+            scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
+            scaled_data_w_complete[:, unknown_column_index] = scaled_data_w
+            print('std: ', np.std(scaled_data_w))
 
         # 3. Create the mask with all true
         mask_with_unknown = np.ones(np.shape(w), dtype=bool)
