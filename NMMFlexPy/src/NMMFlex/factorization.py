@@ -7,7 +7,7 @@
 #         Kimura, and Hiroshi Sawada
 # License: Released under GNU Public License (GPL)
 
-__version__ = '0.1.5'
+__version__ = '0.1.6'
 __author__ = 'Crhistian Cardona <crhisto@gmail.com>'
 
 import math
@@ -537,7 +537,13 @@ class factorization:
             # First I will scale w_mask_fixed
             scaler = StandardScaler(with_mean=False, with_std=True)
             partial_w_fixed_scaled = scaler.fit_transform(partial_w_fixed)
-            partial_w_fixed = partial_w_fixed_scaled
+
+            # Convert to df
+            partial_w_fixed_scaled_df = pd.DataFrame(
+                partial_w_fixed_scaled,
+                index=partial_w_fixed.index,
+                columns=partial_w_fixed.columns)
+            partial_w_fixed = partial_w_fixed_scaled_df
 
             # We know that the matrix h is now all zeros.
             # Since I received the parameter with the mask, I apply it
