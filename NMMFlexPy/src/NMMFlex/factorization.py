@@ -7,7 +7,7 @@
 #         Kimura, and Hiroshi Sawada
 # License: Released under GNU Public License (GPL)
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 __author__ = 'Crhistian Cardona <crhisto@gmail.com>'
 
 import math
