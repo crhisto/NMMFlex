@@ -1253,8 +1253,11 @@ class factorization:
         # The main idea is to scale the unknown columns without centering the
         # the values.
         if scale_w_unfixed_col and w_mask_fixed is not None:
+            print('Using scale_w_unfixed_col for W.')
             # Assign the new scale reference to the w_new variable
             w_new = self._reference_scale_w(w=w, w_mask_fixed=w_mask_fixed)
+        else:
+            print('Not using scale_w_unfixed_col for W.')
 
         return w_new
 
