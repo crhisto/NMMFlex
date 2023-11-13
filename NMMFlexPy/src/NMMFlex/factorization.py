@@ -669,7 +669,9 @@ class factorization:
                 w_new = self._calculate_w_new_extended_alpha_beta_generic(
                     x, x_hat, w, h, beta, None, None, None, regularize_w,
                     alpha_regularizer_w, self.is_model_sparse,
-                    constraint_type_w, constraint_value_w
+                    constraint_type_w, constraint_value_w,
+                    scale_w_unfixed_col=scale_w_unfixed_col,
+                    w_mask_fixed=w_mask_fixed
                 )
 
             # Assign the new values to the original variables w and h if there
@@ -929,6 +931,7 @@ class factorization:
         """
 
         h_proportions = None
+
         # This is temp, since I think always that I activate the constrain
         # all cell-types must sum up to 1, however I leave open the
         # possibility of summing up to 1 just the known cell-types which at
@@ -1250,8 +1253,8 @@ class factorization:
         # the values.
         if scale_w_unfixed_col and w_mask_fixed is not None:
             # Assign the new scale reference to the w_new variable
-            w_new = self._reference_scale_w(w=w,
-                                            w_mask_fixed=w_mask_fixed)
+            w_new = self._reference_scale_w(w=w, w_mask_fixed=w_mask_fixed)
+
         return w_new
 
     def _reference_scale_w(self, w, w_mask_fixed):
