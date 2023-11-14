@@ -283,7 +283,7 @@ class test_NMMFlex_basics(unittest.TestCase):
 
         # We define and np array initially
         w_mask_fixed = np.ones(shape=np.shape(w_df), dtype=bool)
-        w_mask_fixed[:, [0, 1]] = False
+        w_mask_fixed[:, [2]] = False
         # Then we generate the DataFrame that must have the names
         # (index, columns)
         w_mask_fixed_df = pd.DataFrame(data=np.nan_to_num(w_mask_fixed,
@@ -319,7 +319,7 @@ class test_NMMFlex_basics(unittest.TestCase):
 
         # We define and np array initially
         w_mask_fixed = np.ones(shape=np.shape(w_df), dtype=bool)
-        w_mask_fixed[:, [0]] = False
+        w_mask_fixed[:, [1, 2]] = False
         # Then we generate the DataFrame that must have the names
         # (index, columns)
         w_mask_fixed_df = pd.DataFrame(data=np.nan_to_num(w_mask_fixed,

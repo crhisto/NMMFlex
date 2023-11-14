@@ -7,7 +7,7 @@
 #         Kimura, and Hiroshi Sawada
 # License: Released under GNU Public License (GPL)
 
-__version__ = '0.1.9'
+__version__ = '0.1.10'
 __author__ = 'Crhistian Cardona <crhisto@gmail.com>'
 
 import math
@@ -1288,11 +1288,11 @@ class factorization:
         for columns_mask in w_mask_fixed.columns:
             index = w_mask_fixed.columns.get_loc(columns_mask)
             if np.all(w_mask_fixed.iloc[:, index]):
-                unknown_cell_type_name.append(columns_mask)
-                unknown_column_index.append(index)
-            else:
                 known_cell_type_name.append(columns_mask)
                 known_column_index.append(index)
+            else:
+                unknown_cell_type_name.append(columns_mask)
+                unknown_column_index.append(index)
 
         # Since the w is a np.array, I will convert it to df
         w_df = pd.DataFrame(data=w,
@@ -1316,7 +1316,6 @@ class factorization:
                                                 with_mean=False, with_std=True)
             scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
             scaled_data_w_complete[:, unknown_column_index] = scaled_data_w
-            print('std: ', np.std(scaled_data_w, axis=0))
 
         # 3. Create the mask with all true
         mask_with_unknown = np.ones(np.shape(w), dtype=bool)
