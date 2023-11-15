@@ -1308,7 +1308,7 @@ class factorization:
 
         # 2. Scale the data  and put it in a matrix with the same size of
         # the target matrix, otherwise can be wrong assignments.
-        scaled_data_w = self._scale(matrix=w_unfixed_temp)
+        scaled_data_w = self._scale(matrix=w_unfixed_temp.to_numpy())
 
         # 3. Assignment of the scaled matrix
         scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
@@ -1325,14 +1325,19 @@ class factorization:
         mask_with_unknown[:, known_columns] = False
 
         # 6. I add the w reference to replace in it the scaled values
-        w_reference = w.copy()
+        w_reference = w.to_numpy()
 
         # 5. Reassign the data to the H matrix
         np.putmask(w_reference,
                    mask_with_unknown,
                    scaled_data_w_complete)
 
-        return w_reference
+        # 6. Finally I will convert to df
+        w_reference_df = pd.DataFrame(data=w_reference,
+                                      index=w.index,
+                                      columns=w.columns)
+
+        return w_reference_df
 
     def _scale(self, matrix, version_scale='3'):
 
@@ -1347,7 +1352,8 @@ class factorization:
             scaled_matrix = matrix
             for counter_columns in range(np.shape(matrix)[1]):
                 rms = np.sqrt(np.mean(matrix[:, counter_columns] ** 2))
-                scaled_matrix[:, counter_columns] = scaled_matrix[:, counter_columns]/rms
+                scaled_matrix[:, counter_columns] = scaled_matrix[:,
+                                                    counter_columns] / rms
 
         return scaled_matrix
 
