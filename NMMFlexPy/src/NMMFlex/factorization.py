@@ -536,7 +536,8 @@ class factorization:
 
         if partial_w_fixed is not None and w_mask_fixed is not None:
             # First I will scale w_mask_fixed
-            partial_w_fixed_scaled = self._scale(matrix=partial_w_fixed)
+            partial_w_fixed_scaled = self._scale(
+                matrix=partial_w_fixed.to_numpy())
 
             # Convert to df
             partial_w_fixed_scaled_df = pd.DataFrame(
