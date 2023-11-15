@@ -1348,6 +1348,9 @@ class factorization:
 
     def _scale(self, matrix, version_scale='3'):
 
+        print('Matrix to scale:', np.shape(matrix))
+        print(matrix)
+
         scaled_matrix = None
         if version_scale == '1':
             scaler = StandardScaler(with_mean=False, with_std=True)
