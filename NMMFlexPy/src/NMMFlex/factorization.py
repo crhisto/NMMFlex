@@ -1273,6 +1273,7 @@ class factorization:
         # The main idea is to scale the unknown columns without centering the
         # the values.
         if scale_w_unfixed_col and w_mask_fixed is not None:
+            print('Class of w_new:', type(w_new).__name__)
             # Assign the new scale reference to the w_new variable
             w_new = self._reference_scale_w(w=w, w_mask_fixed=w_mask_fixed)
 
@@ -1331,7 +1332,7 @@ class factorization:
         mask_with_unknown[:, known_columns] = False
 
         # 6. I add the w reference to replace in it the scaled values
-        w_reference = w.to_numpy()
+        w_reference = w
 
         # 5. Reassign the data to the H matrix
         np.putmask(w_reference,
@@ -1343,7 +1344,7 @@ class factorization:
                                       index=w.index,
                                       columns=w.columns)
 
-        return w_reference_df
+        return w_reference
 
     def _scale(self, matrix, version_scale='3'):
 
