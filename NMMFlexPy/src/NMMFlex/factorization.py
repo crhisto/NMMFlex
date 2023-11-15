@@ -1311,7 +1311,9 @@ class factorization:
 
         # 1. get the limited part of the data in W that I want to
         # re-scale: unknown
+        print('known_cell_type_name: ', known_cell_type_name)
         w_unfixed_temp = w_df.drop(known_cell_type_name, axis=1)
+        print('w_unfixed_temp: ', w_unfixed_temp)
 
         # 2. Scale the data  and put it in a matrix with the same size of
         # the target matrix, otherwise can be wrong assignments.
