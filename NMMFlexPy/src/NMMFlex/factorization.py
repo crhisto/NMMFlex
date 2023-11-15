@@ -1340,9 +1340,9 @@ class factorization:
                    scaled_data_w_complete)
 
         # 6. Finally I will convert to df
-        w_reference_df = pd.DataFrame(data=w_reference,
-                                      index=w.index,
-                                      columns=w.columns)
+        # w_reference_df = pd.DataFrame(data=w_reference,
+        #                               index=w.index,
+        #                               columns=w.columns)
 
         return w_reference
 
