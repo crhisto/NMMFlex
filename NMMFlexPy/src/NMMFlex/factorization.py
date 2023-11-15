@@ -1286,6 +1286,9 @@ class factorization:
         #    reference, therefore have to be opened, however Do I need to
         #    scale those as well??? this is an open question.
 
+        print('Class of w:', type(w).__name__)
+        print('Class of w_mask_fixed:', type(w_mask_fixed).__name__)
+
         # 0. Check which rows are the fixed ones (TRUE rows)
         unknown_cell_type_name = []
         unknown_column_index = []
