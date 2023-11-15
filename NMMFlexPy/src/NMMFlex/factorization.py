@@ -535,18 +535,21 @@ class factorization:
             h_new = h
 
         if partial_w_fixed is not None and w_mask_fixed is not None:
-            # First I will scale w_mask_fixed
-            partial_w_fixed_scaled = self._scale(
-                matrix=partial_w_fixed.to_numpy())
 
-            # Convert to df
-            partial_w_fixed_scaled_df = pd.DataFrame(
-                partial_w_fixed_scaled,
-                index=partial_w_fixed.index,
-                columns=partial_w_fixed.columns)
-            partial_w_fixed = partial_w_fixed_scaled_df
+            # Scale of w
+            if scale_w_unfixed_col and False:
+                # First I will scale w_mask_fixed
+                partial_w_fixed_scaled = self._scale(
+                    matrix=partial_w_fixed.to_numpy())
 
-            print('Fixing w with scale function')
+                # Convert to df
+                partial_w_fixed_scaled_df = pd.DataFrame(
+                    partial_w_fixed_scaled,
+                    index=partial_w_fixed.index,
+                    columns=partial_w_fixed.columns)
+                partial_w_fixed = partial_w_fixed_scaled_df
+
+                print('Fixing w with scale function')
 
             # We know that the matrix h is now all zeros.
             # Since I received the parameter with the mask, I apply it
@@ -1344,8 +1347,7 @@ class factorization:
             scaled_matrix = matrix
             for counter_columns in range(np.shape(matrix)[1]):
                 rms = np.sqrt(np.mean(matrix[:, counter_columns] ** 2))
-                scaled_matrix[:, counter_columns] = scaled_matrix[:,
-                                                    counter_columns] / rms
+                scaled_matrix[:, counter_columns] = scaled_matrix[:, counter_columns]/rms
 
         return scaled_matrix
 
