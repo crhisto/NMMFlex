@@ -540,7 +540,7 @@ class factorization:
             if scale_w_unfixed_col and False:
                 # First I will scale w_mask_fixed
                 partial_w_fixed_scaled = self._scale(
-                    matrix=partial_w_fixed.to_numpy())
+                    matrix=partial_w_fixed)
 
                 # Convert to df
                 partial_w_fixed_scaled_df = pd.DataFrame(
@@ -548,6 +548,9 @@ class factorization:
                     index=partial_w_fixed.index,
                     columns=partial_w_fixed.columns)
                 partial_w_fixed = partial_w_fixed_scaled_df
+
+                # assign to the original array
+                partial_w_fixed = partial_w_fixed_scaled
 
                 print('Fixing w with scale function')
 
