@@ -45,6 +45,11 @@ class test_NMMFlex_basics(unittest.TestCase):
     data_expression_auxiliary_matrix_random = None
     dec = None
 
+    # Variables for scale test functions
+    row_names = None
+    vector_w = None
+    vector_expected_w = None
+
     def __init__(self, relative_path):
         super(test_NMMFlex_basics, self).__init__(relative_path)
         # To allow the test cases to run from different configurations of main
@@ -61,6 +66,7 @@ class test_NMMFlex_basics(unittest.TestCase):
     def setUp(self):
         # Let's import the data
         self._import_test_data()
+        self._create_scale_objects()
         self.dec = factorization()
 
     def tearDown(self):
@@ -90,6 +96,163 @@ class test_NMMFlex_basics(unittest.TestCase):
                 len(self.bulk_methylation_matrix.columns)),
             index=self.bulk_methylation_matrix.index.values,
             columns=self.bulk_methylation_matrix.columns.values)
+
+    def _create_scale_objects(self):
+        self.row_names = ['row_1', 'row_2', 'row_3', 'row_4', 'row_5', 'row_6',
+                          'row_7', 'row_8', 'row_9', 'row_10', 'row_11',
+                          'row_12',
+                          'row_13', 'row_14', 'row_15', 'row_16', 'row_17',
+                          'row_18', 'row_19', 'row_20', 'row_21', 'row_22',
+                          'row_23', 'row_24', 'row_25', 'row_26', 'row_27',
+                          'row_28', 'row_29', 'row_30', 'row_31', 'row_32',
+                          'row_33', 'row_34', 'row_35', 'row_36', 'row_37',
+                          'row_38', 'row_39', 'row_40', 'row_41', 'row_42',
+                          'row_43', 'row_44', 'row_45', 'row_46', 'row_47',
+                          'row_48', 'row_49', 'row_50', 'row_51', 'row_52',
+                          'row_53', 'row_54', 'row_55', 'row_56', 'row_57',
+                          'row_58', 'row_59', 'row_60', 'row_61', 'row_62',
+                          'row_63', 'row_64', 'row_65', 'row_66', 'row_67',
+                          'row_68', 'row_69', 'row_70', 'row_71', 'row_72',
+                          'row_73', 'row_74', 'row_75', 'row_76', 'row_77',
+                          'row_78', 'row_79', 'row_80', 'row_81', 'row_82',
+                          'row_83', 'row_84', 'row_85', 'row_86', 'row_87',
+                          'row_88', 'row_89', 'row_90', 'row_91', 'row_92',
+                          'row_93', 'row_94', 'row_95', 'row_96', 'row_97',
+                          'row_98', 'row_99', 'row_100', 'row_101', 'row_102',
+                          'row_103', 'row_104', 'row_105', 'row_106',
+                          'row_107',
+                          'row_108', 'row_109', 'row_110', 'row_111',
+                          'row_112',
+                          'row_113', 'row_114', 'row_115', 'row_116',
+                          'row_117',
+                          'row_118', 'row_119', 'row_120', 'row_121',
+                          'row_122',
+                          'row_123', 'row_124', 'row_125', 'row_126',
+                          'row_127',
+                          'row_128', 'row_129', 'row_130', 'row_131',
+                          'row_132',
+                          'row_133', 'row_134', 'row_135', 'row_136',
+                          'row_137',
+                          'row_138', 'row_139']
+
+        self.vector_w = [2144.04512514046, 1234.12313778294, 527.721477088469,
+                         521.684336889795, 313.776371601745, 3762.60997803322,
+                         824.225753864234, 1289.8145205145, 11631.6044706936,
+                         16037.2136626412, 237.534295066678, 34125.2914241053,
+                         385.783436232189, 2112.36821552533, 835.060674509659,
+                         1762.6941754088, 59.1180153204123, 854.267821967888,
+                         1318.77307917526, 31730.0132528068, 15040.7766839414,
+                         983.867113190048, 110.863512361166, 14906.3325820439,
+                         223.263866206162, 1277.94093791392, 1041.04337375048,
+                         1039.27347484291, 75982.4672124783, 207.113910870699,
+                         1463.8219213037, 638.468245200753, 381.28406272268,
+                         142.066489881025, 15999.5927718095, 422.050568881101,
+                         75.0106763149074, 938.291031568208, 1126.71011801524,
+                         1770.72707189943, 2114.01761827404, 171.808934633457,
+                         762.106760130491, 1560.93135147135, 81.6749130704166,
+                         157.143455509349, 15019.6906365253, 21459.2767437355,
+                         11499.4166967976, 14726.4991203779, 1227.6422461364,
+                         5621.18213965833, 483.967243617198, 752.772720504604,
+                         3648.78075740076, 4604.73820976071, 2727.56789880113,
+                         124.182462144608, 45155.3800224986, 115.20533380018,
+                         3878.34297282387, 45130.3921539691, 2314.00137104076,
+                         93.8985406946534, 646.793651471288, 4274.48661223249,
+                         1920.75857779506, 1745.54785654911, 1053.95333938062,
+                         16762.306026555, 13300.6688103201, 466.571461356833,
+                         722.260297953265, 245.645138469081, 51873.2887854523,
+                         11027.9224622221, 468.970972498434, 3493.98760576313,
+                         2517.3456996009, 2512.8292565017, 2895.73396550778,
+                         4756.35638534189, 2412.19457457424, 1921.33301300431,
+                         902.317840666097, 106.410504112754, 1191.17159122783,
+                         120.219255853645, 18454.1595689252, 2452.88275958334,
+                         1775.79556454523, 215.57560844213, 3371.29338949873,
+                         4191.87065600182, 846.348656118452, 1150.94047558275,
+                         618.970193659083, 664.536113114267, 179.920153187018,
+                         1704.5140908221, 41174.7575945275, 1441.89281126052,
+                         315.506580906101, 131.295382734179, 816.52653542382,
+                         3945.50538801564, 479.882551330492, 643.37513250604,
+                         269.626640564534, 43337.6068863126, 111.928611355041,
+                         39047.165377238, 304.40029779196, 28611.5243177786,
+                         274.588362360545, 815.770649724661, 135.306853805709,
+                         35808.0784352, 578.406635337261, 343.495390145685,
+                         1772.30724796426, 11101.0359336359, 792.544192976084,
+                         1633.07402260012, 2976.03772248096, 30255.7735878829,
+                         316.060946281093, 455.86643568064, 2998.86930670701,
+                         613.510873498364, 19326.1859104222, 765.913564361909,
+                         114.768689540617, 721.108175869882, 719.66048896514,
+                         502.711880395261, 121.993211564522, 88.0838136927713,
+                         591.487211916918]
+
+        self.vector_expected_w = [0.154662023326754, 0.0890242370768047,
+                                  0.038067515670473, 0.0376320228222649,
+                                  0.0226344529483138, 0.271418201682638,
+                                  0.0594560353585423, 0.0930415694706664,
+                                  0.83905299421165, 1.15685434252465,
+                                  0.0171346835258889, 2.46164903731748,
+                                  0.0278287271634309, 0.152376989827986,
+                                  0.0602376190714767, 0.12715303632294,
+                                  0.00426451465843938, 0.0616231385521035,
+                                  0.0951305130393355, 2.28886416256856,
+                                  1.08497574377864, 0.0709718637104974,
+                                  0.00799720814353906, 1.07527753520085,
+                                  0.0161052772995795, 0.092185061234151,
+                                  0.0750963086864185, 0.0749686359322779,
+                                  5.48104234311335, 0.0149402902666429,
+                                  0.10559370112327, 0.0460563023952965,
+                                  0.0275041620679842, 0.0102480542570155,
+                                  1.15414053625856, 0.0304448792443593,
+                                  0.0054109416046977, 0.0676842048285617,
+                                  0.0812759323540571, 0.12773249428763,
+                                  0.152495970517061, 0.0123935439345212,
+                                  0.0549750432631668, 0.112598750027198,
+                                  0.00589167045151618, 0.0113356405127161,
+                                  1.08345468868559, 1.54797822181912,
+                                  0.829517547252025, 1.06230513703768,
+                                  0.0885567339430028, 0.405487455937204,
+                                  0.034911276933504, 0.0543017265323647,
+                                  0.263207060335708, 0.332165643372338,
+                                  0.196754800094074, 0.00895797883718743,
+                                  3.25731131144481, 0.00831040812277799,
+                                  0.279766672957847, 3.25550879606858,
+                                  0.166921922411778, 0.00677342940266392,
+                                  0.0466568607341673, 0.308342739795502,
+                                  0.138555109909145, 0.125916175989942,
+                                  0.0760275770548053, 1.2091593293865,
+                                  0.959451984327235, 0.0336564214035564,
+                                  0.0521006940293377, 0.0177197642393463,
+                                  3.74191182176983, 0.795506018552708,
+                                  0.0338295116262404, 0.25204096044878,
+                                  0.181590291523212, 0.181264495102339,
+                                  0.208885563493957, 0.343102714394553,
+                                  0.174005149978842, 0.138596547148824,
+                                  0.0650892564176342, 0.0076759876349245,
+                                  0.085925900657793, 0.00867209049620319,
+                                  1.3312022327598, 0.176940217410591,
+                                  0.128098113144539, 0.0155506800629355,
+                                  0.243190337150121, 0.302383186612649,
+                                  0.0610518846176726, 0.0830238042077696,
+                                  0.0446497983683971, 0.0479367241961457,
+                                  0.0129786517097398, 0.122956179879021,
+                                  2.97016664662832, 0.104011831185337,
+                                  0.0227592626683391, 0.00947107377033327,
+                                  0.0589006474667174, 0.284611475384471,
+                                  0.0346166251249569, 0.0464102637508544,
+                                  0.019449684749417, 3.12618512016507,
+                                  0.00807403971928547, 2.81669146400189,
+                                  0.0219581040556162, 2.0639100313527,
+                                  0.0198076016249329, 0.0588461211835414,
+                                  0.00976044372116345, 2.58303792084055,
+                                  0.0417237209599402, 0.0247782527617575,
+                                  0.127846481266977, 0.800780104106551,
+                                  0.0571706663373142, 0.11780280630108,
+                                  0.214678324750976, 2.18251897105551,
+                                  0.0227992521580906, 0.0328842077446968,
+                                  0.216325295223168, 0.0442559869265834,
+                                  1.39410639311944, 0.0552496494446955,
+                                  0.00827891051861563, 0.0520175849891192,
+                                  0.0519131551974112, 0.036263432919694,
+                                  0.00880005589036364, 0.00635398046819017,
+                                  0.0426672964548626]
 
     #  Multiplication of two matrices W and H
     def test_calculate_x_hat(self):
@@ -212,7 +375,8 @@ class test_NMMFlex_basics(unittest.TestCase):
 
         # Row and column names
         column_names = ['column_1', 'column_2', 'column_3']
-        row_names = ['row_1', 'row_2', 'cluster_unknown_01', 'cluster_unknown_02']
+        row_names = ['row_1', 'row_2', 'cluster_unknown_01',
+                     'cluster_unknown_02']
 
         # We define and np array initially
         h_mask_fixed = np.ones(shape=np.shape(h), dtype=bool)
@@ -232,7 +396,8 @@ class test_NMMFlex_basics(unittest.TestCase):
         self.assertTrue(np.all(np.round(prop_columns, 3) == 1.0),
                         'All known variables sum up 1 for k=2.')
 
-    def test_proportion_constraint_h_partial_fixed_multiple_k_semi_defined(self):
+    def test_proportion_constraint_h_partial_fixed_multiple_k_semi_defined(
+            self):
 
         h = np.array([[0.11692266, 0.49023124, 0.03157466],
                       [0.38518708, 0.08108722, 0.34163091],
@@ -264,6 +429,40 @@ class test_NMMFlex_basics(unittest.TestCase):
         prop_columns = h_new[[0, 1], :].sum(axis=0)
         self.assertTrue(np.all(np.round(prop_columns, 3) == 1.0),
                         'All known variables sum up 1 for k=2.')
+
+    def test_scale_vector(self):
+        # Row and column names
+        column_names = ['column_1']
+        w = np.array(np.transpose([self.vector_w])).astype(float)
+        expected_w = np.array(np.transpose([self.vector_expected_w])).astype(
+            float)
+
+        w_df = pd.DataFrame(data=w,
+                            index=self.row_names,
+                            columns=column_names)
+        w_new = self.dec._scale(matrix=w)
+
+        np.testing.assert_allclose(
+            expected_w, w_new, 1e-7, 0,
+            'The scaled version of w is not correct.')
+
+    def test_scale_matrix(self):
+        # Row and column names
+        column_names = ['column_1', 'column_2']
+        w = np.array(np.transpose([self.vector_w, self.vector_w])).astype(
+            float)
+
+        expected_w = np.array(np.transpose([self.vector_expected_w,
+                              self.vector_expected_w])).astype(float)
+
+        w_df = pd.DataFrame(data=w,
+                            index=self.row_names,
+                            columns=column_names)
+        w_new = self.dec._scale(matrix=w)
+
+        np.testing.assert_allclose(
+            expected_w, w_new, 1e-7, 0,
+            'The scaled version of the matrix w is not correct.')
 
     def test_reference_scale_w_partial_fixed(self):
 
@@ -334,7 +533,7 @@ class test_NMMFlex_basics(unittest.TestCase):
         mean_columns = w_new[:, [1, 2]].mean(axis=0)
         std_first_column = np.std(w_new[:, 1])
         std_second_column = np.std(w_new[:, 2])
-        self.assertTrue(np.all(w_new[:, [1,2]] > 0) and
+        self.assertTrue(np.all(w_new[:, [1, 2]] > 0) and
                         std_first_column == 1.0 and
                         std_second_column == 1.0,
                         'All unknown variables are greater than zero and... ')
@@ -460,19 +659,19 @@ class test_NMMFlex_basics(unittest.TestCase):
         exp_matrix = self.dec.scale_matrix(matrix, 'exp')
 
         self.assertTrue((np.all(np.round(normal_zero_one_matrix, 3) <= 1.0) and
-                        np.all(np.round(normal_zero_one_matrix, 3) >= 0.0)),
+                         np.all(np.round(normal_zero_one_matrix, 3) >= 0.0)),
                         'Scaled matrix between 0 and 1')
 
         self.assertTrue((np.all(np.round(sigmoid_matrix, 3) <= 1.0) and
-                        np.all(np.round(sigmoid_matrix, 3) >= 0.0)),
+                         np.all(np.round(sigmoid_matrix, 3) >= 0.0)),
                         'Scaled sigmoid matrix between 0 and 1')
 
         self.assertTrue((np.all(np.round(power_matrix_75, 3) <= 1.0) and
-                        np.all(np.round(power_matrix_75, 3) >= 0.0)),
+                         np.all(np.round(power_matrix_75, 3) >= 0.0)),
                         'Scaled power .75 matrix between 0 and 1')
 
         self.assertTrue((np.all(np.round(exp_matrix, 3) <= 1.0) and
-                        np.all(np.round(exp_matrix, 3) >= 0.0)),
+                         np.all(np.round(exp_matrix, 3) >= 0.0)),
                         'Scaled exponential matrix between 0 and 1')
 
 

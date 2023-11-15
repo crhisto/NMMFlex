@@ -536,8 +536,7 @@ class factorization:
 
         if partial_w_fixed is not None and w_mask_fixed is not None:
             # First I will scale w_mask_fixed
-            scaler = StandardScaler(with_mean=False, with_std=True)
-            partial_w_fixed_scaled = scaler.fit_transform(partial_w_fixed)
+            partial_w_fixed_scaled = self._scale(matrix=partial_w_fixed)
 
             # Convert to df
             partial_w_fixed_scaled_df = pd.DataFrame(
@@ -1305,29 +1304,23 @@ class factorization:
 
         # 2. Scale the data  and put it in a matrix with the same size of
         # the target matrix, otherwise can be wrong assignments.
-        version_scale = '2'
-        if version_scale == '1':
-            scaler = StandardScaler(with_mean=False, with_std=True)
-            scaled_data_w = scaler.fit_transform(w_unfixed_temp)
-            scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
-            scaled_data_w_complete[:, unknown_column_index] = scaled_data_w
-        else:
-            scaled_data_w = preprocessing.scale(w_unfixed_temp, axis=0,
-                                                with_mean=False, with_std=True)
-            scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
-            scaled_data_w_complete[:, unknown_column_index] = scaled_data_w
+        scaled_data_w = self._scale(matrix=w_unfixed_temp)
 
-        # 3. Create the mask with all true
+        # 3. Assignment of the scaled matrix
+        scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
+        scaled_data_w_complete[:, unknown_column_index] = scaled_data_w
+
+        # 4. Create the mask with all true
         mask_with_unknown = np.ones(np.shape(w), dtype=bool)
 
-        # 4. Now I will take the index for each known column
+        # 5. Now I will take the index for each known column
         known_columns = []
         for known_counter in known_cell_type_name:
             known_columns.append(w_df.columns.get_loc(known_counter))
 
         mask_with_unknown[:, known_columns] = False
 
-        # I add the w reference to replace in it the scaled values
+        # 6. I add the w reference to replace in it the scaled values
         w_reference = w.copy()
 
         # 5. Reassign the data to the H matrix
@@ -1336,6 +1329,24 @@ class factorization:
                    scaled_data_w_complete)
 
         return w_reference
+
+    def _scale(self, matrix, version_scale='3'):
+
+        scaled_matrix = None
+        if version_scale == '1':
+            scaler = StandardScaler(with_mean=False, with_std=True)
+            scaled_matrix = scaler.fit_transform(matrix)
+        elif version_scale == '2':
+            scaled_matrix = preprocessing.scale(matrix, axis=0,
+                                                with_mean=False, with_std=True)
+        elif version_scale == '3':
+            scaled_matrix = matrix
+            for counter_columns in range(np.shape(matrix)[1]):
+                rms = np.sqrt(np.mean(matrix[:, counter_columns] ** 2))
+                scaled_matrix[:, counter_columns] = scaled_matrix[:,
+                                                    counter_columns] / rms
+
+        return scaled_matrix
 
     def _calculate_w_new_extended_alpha_beta(self, x, x_hat, w, h, beta,
                                              z, z_hat, b, regularize_w,
