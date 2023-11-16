@@ -1254,8 +1254,6 @@ class factorization:
 
         w_new = np.zeros(shape=(np.shape(w)))
 
-        print('w_new before is_space _calculate_w_new_extended_alpha_beta_sparse:  ')
-        print(w_new)
         if is_sparse:
             w_new = self._calculate_w_new_extended_alpha_beta_sparse(
                 x, x_hat, w, h, beta, z, z_hat,
@@ -1264,9 +1262,6 @@ class factorization:
             w_new = self._calculate_w_new_extended_alpha_beta(
                 x, x_hat, w, h, beta, z, z_hat,
                 b, regularize_w, alpha_regularizer_w)
-
-        print('w_new after is_space _calculate_w_new_extended_alpha_beta_sparse:  ')
-        print(w_new[:, 5])
 
         # Checking if there is a constraint for the W
         if constraint_type_w is not None:
@@ -1359,8 +1354,8 @@ class factorization:
 
     def _scale(self, matrix, version_scale='3'):
 
-        print('Matrix to scale:', np.shape(matrix))
-        print(matrix)
+        #print('Matrix to scale:', np.shape(matrix))
+        #print(matrix)
 
         scaled_matrix = None
         if version_scale == '1':
@@ -1376,8 +1371,8 @@ class factorization:
                 scaled_matrix[:, counter_columns] = scaled_matrix[:,
                                                     counter_columns] / rms
 
-        print('Matrix scaled:', np.shape(scaled_matrix))
-        print(scaled_matrix)
+        #print('Matrix scaled:', np.shape(scaled_matrix))
+        #print(scaled_matrix)
 
         return scaled_matrix
 
