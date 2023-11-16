@@ -1265,6 +1265,8 @@ class factorization:
 
         # Checking if there is a constraint for the W
         if constraint_type_w is not None:
+            print('constraint_type_w is Active with constraint_type_w: ',
+                  constraint_value_w)
             w_new_scaled = self.scale_matrix(matrix=w_new,
                                              scale_type=constraint_type_w,
                                              value=constraint_value_w)
@@ -1273,6 +1275,7 @@ class factorization:
         # The main idea is to scale the unknown columns without centering the
         # the values.
         if scale_w_unfixed_col and w_mask_fixed is not None:
+            print('scale_w_unfixed_col is Active with _reference_scale_w.')
             #print('Class of w_new:', type(w_new).__name__)
             # Assign the new scale reference to the w_new variable
             w_new = self._reference_scale_w(w=w, w_mask_fixed=w_mask_fixed)
@@ -1351,7 +1354,7 @@ class factorization:
 
     def _scale(self, matrix, version_scale='3'):
 
-        #print('Matrix to scale:', np.shape(matrix))
+        print('Matrix to scale:', np.shape(matrix))
         print(matrix)
 
         scaled_matrix = None
@@ -1367,6 +1370,9 @@ class factorization:
                 rms = np.sqrt(np.mean(matrix[:, counter_columns] ** 2))
                 scaled_matrix[:, counter_columns] = scaled_matrix[:,
                                                     counter_columns] / rms
+
+        print('Matrix scaled:', np.shape(scaled_matrix))
+        print(scaled_matrix)
 
         return scaled_matrix
 
@@ -1489,6 +1495,7 @@ class factorization:
                 w_new[i][k] = w[i][k] * self.division(up_temp, down_temp)
 
         if regularize_w is not None:
+            print('regularize_w is Active with regularization_type: ', regularize_w)
             w_new = self._regularize_w(w_new, regularization_type=regularize_w)
 
         return w_new
@@ -1630,6 +1637,8 @@ class factorization:
         if regularize_w is not None:
             # TODO: Test the _regularize_w function with sparse values to
             #  ensure its correct behavior.
+            print('regularize_w is Active with regularization_type: ',
+                  regularize_w)
             w_new = self._regularize_w(w_new, regularization_type=regularize_w)
 
         return w_new
