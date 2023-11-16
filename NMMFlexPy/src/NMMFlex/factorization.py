@@ -537,22 +537,22 @@ class factorization:
         if partial_w_fixed is not None and w_mask_fixed is not None:
 
             # Scale of w
-            if scale_w_unfixed_col and False:
-                # First I will scale w_mask_fixed
-                partial_w_fixed_scaled = self._scale(
-                    matrix=partial_w_fixed)
-
-                # Convert to df
-                partial_w_fixed_scaled_df = pd.DataFrame(
-                    partial_w_fixed_scaled,
-                    index=partial_w_fixed.index,
-                    columns=partial_w_fixed.columns)
-                partial_w_fixed = partial_w_fixed_scaled_df
-
-                # assign to the original array
-                partial_w_fixed = partial_w_fixed_scaled
-
-                print('Fixing w with scale function')
+            # if scale_w_unfixed_col and False:
+            #     # First I will scale w_mask_fixed
+            #     partial_w_fixed_scaled = self._scale(
+            #         matrix=partial_w_fixed)
+            #
+            #     # Convert to df
+            #     partial_w_fixed_scaled_df = pd.DataFrame(
+            #         partial_w_fixed_scaled,
+            #         index=partial_w_fixed.index,
+            #         columns=partial_w_fixed.columns)
+            #     partial_w_fixed = partial_w_fixed_scaled_df
+            #
+            #     # assign to the original array
+            #     partial_w_fixed = partial_w_fixed_scaled
+            #
+            #     print('Fixing w with scale function')
 
             # We know that the matrix h is now all zeros.
             # Since I received the parameter with the mask, I apply it
@@ -1318,6 +1318,7 @@ class factorization:
         # 2. Scale the data  and put it in a matrix with the same size of
         # the target matrix, otherwise can be wrong assignments.
         scaled_data_w = self._scale(matrix=w_unfixed_temp.to_numpy())
+        print('scaled_data_w: ', scaled_data_w)
 
         # 3. Assignment of the scaled matrix
         scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
