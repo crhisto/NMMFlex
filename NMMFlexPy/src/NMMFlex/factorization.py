@@ -1266,7 +1266,7 @@ class factorization:
                 b, regularize_w, alpha_regularizer_w)
 
         print('w_new after is_space _calculate_w_new_extended_alpha_beta_sparse:  ')
-        print(w_new)
+        print(w_new[:, 5])
 
         # Checking if there is a constraint for the W
         if constraint_type_w is not None:
@@ -1283,7 +1283,7 @@ class factorization:
             print('scale_w_unfixed_col is Active with _reference_scale_w.')
             #print('Class of w_new:', type(w_new).__name__)
             # Assign the new scale reference to the w_new variable
-            w_new = self._reference_scale_w(w=w, w_mask_fixed=w_mask_fixed)
+            w_new = self._reference_scale_w(w=w_new, w_mask_fixed=w_mask_fixed)
 
         return w_new
 
