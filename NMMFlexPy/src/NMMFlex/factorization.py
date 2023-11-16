@@ -1273,7 +1273,7 @@ class factorization:
         # The main idea is to scale the unknown columns without centering the
         # the values.
         if scale_w_unfixed_col and w_mask_fixed is not None:
-            print('Class of w_new:', type(w_new).__name__)
+            #print('Class of w_new:', type(w_new).__name__)
             # Assign the new scale reference to the w_new variable
             w_new = self._reference_scale_w(w=w, w_mask_fixed=w_mask_fixed)
 
@@ -1287,8 +1287,8 @@ class factorization:
         #    reference, therefore have to be opened, however Do I need to
         #    scale those as well??? this is an open question.
 
-        print('Class of w:', type(w).__name__)
-        print('Class of w_mask_fixed:', type(w_mask_fixed).__name__)
+        #print('Class of w:', type(w).__name__)
+        #print('Class of w_mask_fixed:', type(w_mask_fixed).__name__)
 
         # 0. Check which rows are the fixed ones (TRUE rows)
         unknown_cell_type_name = []
@@ -1311,14 +1311,14 @@ class factorization:
 
         # 1. get the limited part of the data in W that I want to
         # re-scale: unknown
-        print('known_cell_type_name: ', known_cell_type_name)
+        #print('known_cell_type_name: ', known_cell_type_name)
         w_unfixed_temp = w_df.drop(known_cell_type_name, axis=1)
-        print('w_unfixed_temp: ', w_unfixed_temp)
+        #print('w_unfixed_temp: ', w_unfixed_temp)
 
         # 2. Scale the data  and put it in a matrix with the same size of
         # the target matrix, otherwise can be wrong assignments.
         scaled_data_w = self._scale(matrix=w_unfixed_temp.to_numpy())
-        print('scaled_data_w: ', scaled_data_w)
+        #print('scaled_data_w: ', scaled_data_w)
 
         # 3. Assignment of the scaled matrix
         scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
@@ -1351,7 +1351,7 @@ class factorization:
 
     def _scale(self, matrix, version_scale='3'):
 
-        print('Matrix to scale:', np.shape(matrix))
+        #print('Matrix to scale:', np.shape(matrix))
         print(matrix)
 
         scaled_matrix = None
