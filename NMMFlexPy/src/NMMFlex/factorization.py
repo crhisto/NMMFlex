@@ -535,7 +535,6 @@ class factorization:
             h_new = h
 
         if partial_w_fixed is not None and w_mask_fixed is not None:
-
             # Scale of w
             # if scale_w_unfixed_col and False:
             #     # First I will scale w_mask_fixed
@@ -1275,8 +1274,8 @@ class factorization:
         # The main idea is to scale the unknown columns without centering the
         # the values.
         if scale_w_unfixed_col and w_mask_fixed is not None:
-            #print('scale_w_unfixed_col is Active with _reference_scale_w.')
-            #print('Class of w_new:', type(w_new).__name__)
+            # print('scale_w_unfixed_col is Active with _reference_scale_w.')
+            # print('Class of w_new:', type(w_new).__name__)
             # Assign the new scale reference to the w_new variable
             w_new = self._reference_scale_w(w=w_new, w_mask_fixed=w_mask_fixed)
 
@@ -1290,22 +1289,25 @@ class factorization:
         #    reference, therefore have to be opened, however Do I need to
         #    scale those as well??? this is an open question.
 
-        #print('Class of w:', type(w).__name__)
-        #print('Class of w_mask_fixed:', type(w_mask_fixed).__name__)
+        # print('Class of w:', type(w).__name__)
+        # print('Class of w_mask_fixed:', type(w_mask_fixed).__name__)
 
         # 0. Check which rows are the fixed ones (TRUE rows)
         unknown_cell_type_name = []
         unknown_column_index = []
         known_cell_type_name = []
         known_column_index = []
+        # I will check for all the cells in a column False to identify the
+        # unknown columns, since it is possible to have partial known columns
+        # with some values in True and others with False.
         for columns_mask in w_mask_fixed.columns:
             index = w_mask_fixed.columns.get_loc(columns_mask)
-            if np.all(w_mask_fixed.iloc[:, index]):
-                known_cell_type_name.append(columns_mask)
-                known_column_index.append(index)
-            else:
+            if np.all(w_mask_fixed.iloc[:, index] == False):
                 unknown_cell_type_name.append(columns_mask)
                 unknown_column_index.append(index)
+            else:
+                known_cell_type_name.append(columns_mask)
+                known_column_index.append(index)
 
         # Since the w is a np.array, I will convert it to df
         w_df = pd.DataFrame(data=w,
@@ -1314,14 +1316,14 @@ class factorization:
 
         # 1. get the limited part of the data in W that I want to
         # re-scale: unknown
-        #print('known_cell_type_name: ', known_cell_type_name)
+        # print('known_cell_type_name: ', known_cell_type_name)
         w_unfixed_temp = w_df.drop(known_cell_type_name, axis=1)
-        #print('w_unfixed_temp: ', w_unfixed_temp)
+        # print('w_unfixed_temp: ', w_unfixed_temp)
 
         # 2. Scale the data  and put it in a matrix with the same size of
         # the target matrix, otherwise can be wrong assignments.
         scaled_data_w = self._scale(matrix=w_unfixed_temp.to_numpy())
-        #print('scaled_data_w: ', scaled_data_w)
+        # print('scaled_data_w: ', scaled_data_w)
 
         # 3. Assignment of the scaled matrix
         scaled_data_w_complete = np.zeros(np.shape(w), dtype=float)
@@ -1354,8 +1356,8 @@ class factorization:
 
     def _scale(self, matrix, version_scale='3'):
 
-        #print('Matrix to scale:', np.shape(matrix))
-        #print(matrix)
+        # print('Matrix to scale:', np.shape(matrix))
+        # print(matrix)
 
         scaled_matrix = None
         if version_scale == '1':
@@ -1371,8 +1373,8 @@ class factorization:
                 scaled_matrix[:, counter_columns] = scaled_matrix[:,
                                                     counter_columns] / rms
 
-        #print('Matrix scaled:', np.shape(scaled_matrix))
-        #print(scaled_matrix)
+        # print('Matrix scaled:', np.shape(scaled_matrix))
+        # print(scaled_matrix)
 
         return scaled_matrix
 
@@ -1495,7 +1497,8 @@ class factorization:
                 w_new[i][k] = w[i][k] * self.division(up_temp, down_temp)
 
         if regularize_w is not None:
-            print('regularize_w is Active with regularization_type: ', regularize_w)
+            print('regularize_w is Active with regularization_type: ',
+                  regularize_w)
             w_new = self._regularize_w(w_new, regularization_type=regularize_w)
 
         return w_new

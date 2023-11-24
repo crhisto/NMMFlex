@@ -537,6 +537,46 @@ class test_NMMFlex_basics(unittest.TestCase):
                         std_second_column > 0.0,
                         'All unknown variables are greater than zero and... ')
 
+    def test_reference_scale_w_partial_fixed_multiple_rows_unfixed_fixed(self):
+        # Row and column names
+        column_names = ['column_1', 'unknown_2', 'unknown_1']
+        row_names = ['row_1', 'row_2', 'row_3', 'row_4']
+
+        # The idea is to fix the first two columns
+        w = np.array([[0.11692266, 0.49023124, 0.03157466],
+                      [0.38518708, 0.08108722, 0.34163091],
+                      [0.11876603, 0.26641129, 0.75638277],
+                      [0.42219656, 0.17418068, 0.06863269]]).astype(float)
+
+        w_df = pd.DataFrame(data=np.nan_to_num(w, nan=-1),
+                            index=row_names,
+                            columns=column_names)
+
+        # We define and np array initially
+        w_mask_fixed = np.ones(shape=np.shape(w_df), dtype=bool)
+        w_mask_fixed[:, [1, 2]] = False
+        # We fixed just the first rows of column 1 to simulate a real scenario
+        # where some genes are not in the reference.
+        w_mask_fixed[[2, 3], 0] = False
+        # Then we generate the DataFrame that must have the names
+        # (index, columns)
+        w_mask_fixed_df = pd.DataFrame(data=np.nan_to_num(w_mask_fixed,
+                                                          nan=-1),
+                                       index=row_names,
+                                       columns=column_names)
+
+        w_new = self.dec._reference_scale_w(w=w,
+                                            w_mask_fixed=w_mask_fixed_df)
+
+        # Now we test if the first rows are 1 deleting the unknown one
+        mean_columns = w_new[:, [1, 2]].mean(axis=0)
+        std_first_column = np.std(w_new[:, 1])
+        std_second_column = np.std(w_new[:, 2])
+        self.assertTrue(np.all(w_new[:, [1, 2]] > 0) and
+                        std_first_column > 0.0 and
+                        std_second_column > 0.0,
+                        'All unknown variables are greater than zero and... ')
+
     def test_calculate_divergence_equal_matrix(self):
         k = 4
         w = np.array(np.random.rand(10, k))
