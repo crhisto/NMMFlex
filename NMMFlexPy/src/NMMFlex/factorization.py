@@ -1316,7 +1316,8 @@ class factorization:
 
         # 1. get the limited part of the data in W that I want to
         # re-scale: unknown
-        # print('known_cell_type_name: ', known_cell_type_name)
+        print('known_cell_type_name: ', known_cell_type_name)
+        print('unknown_cell_type_name: ', unknown_cell_type_name)
         w_unfixed_temp = w_df.drop(known_cell_type_name, axis=1)
         # print('w_unfixed_temp: ', w_unfixed_temp)
 
