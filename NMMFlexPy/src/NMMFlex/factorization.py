@@ -1281,7 +1281,7 @@ class factorization:
 
         return w_new
 
-    def _reference_scale_w(self, w, w_mask_fixed):
+    def _reference_scale_w(self, w, w_mask_fixed, known_scaled=True):
         # In this part there are two possibilities:
         # 1. Complete columns for known and unknown cell-types. In this case
         #    the algorithm works fine.
@@ -1333,12 +1333,22 @@ class factorization:
         # 4. Create the mask with all true
         mask_with_unknown = np.ones(np.shape(w), dtype=bool)
 
-        # 5. Now I will take the index for each known column
-        known_columns = []
-        for known_counter in known_cell_type_name:
-            known_columns.append(w_df.columns.get_loc(known_counter))
+        if known_scaled:
+            for column in known_column_index:
+                column_mask_pattern = w_mask_fixed.iloc[:, column]
+                column_values = w_df.iloc[:, column]
+                new_column_values = column_values.copy().to_frame()
+                new_column_values[:] = 0
+                partial_data = pd.DataFrame(column_values[~column_mask_pattern])
 
-        mask_with_unknown[:, known_columns] = False
+                partial_data_scaled = self._scale(matrix=partial_data.to_numpy())
+                new_column_values[~column_mask_pattern] = partial_data_scaled
+
+                # Add the partial data of the known columns
+                scaled_data_w_complete[:, known_column_index] = new_column_values
+                mask_with_unknown = ~w_mask_fixed
+        else:
+            mask_with_unknown[:, known_column_index] = False
 
         # 6. I add the w reference to replace in it the scaled values
         w_reference = w
@@ -1347,11 +1357,6 @@ class factorization:
         np.putmask(w_reference,
                    mask_with_unknown,
                    scaled_data_w_complete)
-
-        # 6. Finally I will convert to df
-        # w_reference_df = pd.DataFrame(data=w_reference,
-        #                               index=w.index,
-        #                               columns=w.columns)
 
         return w_reference
 
