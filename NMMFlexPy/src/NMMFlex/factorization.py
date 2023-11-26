@@ -7,7 +7,7 @@
 #         Kimura, and Hiroshi Sawada
 # License: Released under GNU Public License (GPL)
 
-__version__ = '0.1.13'
+__version__ = '0.1.14'
 __author__ = 'Crhistian Cardona <crhisto@gmail.com>'
 
 import math
@@ -1281,7 +1281,7 @@ class factorization:
 
         return w_new
 
-    def _reference_scale_w(self, w, w_mask_fixed, known_scaled_type='complete'):
+    def _reference_scale_w(self, w, w_mask_fixed, known_scaled_type='partial'):
         # In this part there are two possibilities:
         # 1. Complete columns for known and unknown cell-types. In this case
         #    the algorithm works fine.
