@@ -1281,7 +1281,7 @@ class factorization:
 
         return w_new
 
-    def _reference_scale_w(self, w, w_mask_fixed, known_scaled=True):
+    def _reference_scale_w(self, w, w_mask_fixed, known_scaled_type='complete'):
         # In this part there are two possibilities:
         # 1. Complete columns for known and unknown cell-types. In this case
         #    the algorithm works fine.
@@ -1333,20 +1333,38 @@ class factorization:
         # 4. Create the mask with all true
         mask_with_unknown = np.ones(np.shape(w), dtype=bool)
 
-        if known_scaled:
+        if known_scaled_type == 'partial':
             for column in known_column_index:
                 column_mask_pattern = w_mask_fixed.iloc[:, column]
                 column_values = w_df.iloc[:, column]
                 new_column_values = column_values.copy().to_frame()
                 new_column_values[:] = 0
-                partial_data = pd.DataFrame(column_values[~column_mask_pattern])
+                partial_data = pd.DataFrame(
+                    column_values[~column_mask_pattern])
 
-                partial_data_scaled = self._scale(matrix=partial_data.to_numpy())
+                partial_data_scaled = self._scale(
+                    matrix=partial_data.to_numpy())
                 new_column_values[~column_mask_pattern] = partial_data_scaled
 
                 # Add the partial data of the known columns
                 scaled_data_w_complete[:, known_column_index] = new_column_values
-                mask_with_unknown = ~w_mask_fixed
+
+            mask_with_unknown = ~w_mask_fixed
+        elif known_scaled_type == 'complete':
+            # All the values: fixed and not fixed will be scale, however
+            # just the un fixed will be used and then the fixed will be
+            # the same.
+
+            # Getting just the known part
+            w_unfixed_temp = w_df.drop(unknown_cell_type_name, axis=1)
+
+            partial_data_scaled = self._scale(
+                matrix=w_unfixed_temp.to_numpy())
+
+            # Add the partial data of the known columns
+            scaled_data_w_complete[:, known_column_index] = partial_data_scaled
+
+            mask_with_unknown = ~w_mask_fixed
         else:
             mask_with_unknown[:, known_column_index] = False
 
