@@ -7,7 +7,7 @@
 #         Kimura, and Hiroshi Sawada
 # License: Released under GNU Public License (GPL)
 
-__version__ = '0.1.15'
+__version__ = '0.1.16'
 __author__ = 'Crhistian Cardona <crhisto@gmail.com>'
 
 import math
@@ -1333,8 +1333,8 @@ class factorization:
         # 4. Create the mask with all true
         mask_with_unknown = np.ones(np.shape(w), dtype=bool)
 
+        #print("known_scaled_type: ", known_scaled_type)
         if known_scaled_type == 'partial':
-            print("known_scaled_type: partial.")
             for column in known_column_index:
                 column_mask_pattern = w_mask_fixed.iloc[:, column]
                 column_values = w_df.iloc[:, column]
@@ -1352,8 +1352,6 @@ class factorization:
 
             mask_with_unknown = ~w_mask_fixed
         elif known_scaled_type == 'complete':
-            print("known_scaled_type: complete.")
-
             # All the values: fixed and not fixed will be scale, however
             # just the un fixed will be used and then the fixed will be
             # the same.
