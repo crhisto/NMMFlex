@@ -1309,6 +1309,9 @@ class factorization:
                 known_cell_type_name.append(columns_mask)
                 known_column_index.append(index)
 
+        # Let's count the false values, therefore if >0 is a semi-reference
+        count_false_known_column = (~w_mask_fixed.iloc[:, known_column_index]).values.sum()
+
         # Since the w is a np.array, I will convert it to df
         w_df = pd.DataFrame(data=w,
                             index=w_mask_fixed.index,
@@ -1334,7 +1337,7 @@ class factorization:
         mask_with_unknown = np.ones(np.shape(w), dtype=bool)
 
         #print("known_scaled_type: ", known_scaled_type)
-        if known_scaled_type == 'partial':
+        if known_scaled_type == 'partial' and count_false_known_column > 0:
             for column in known_column_index:
                 column_mask_pattern = w_mask_fixed.iloc[:, column]
                 column_values = w_df.iloc[:, column]
@@ -1351,7 +1354,7 @@ class factorization:
                 scaled_data_w_complete[:, known_column_index] = new_column_values
 
             mask_with_unknown = ~w_mask_fixed
-        elif known_scaled_type == 'complete':
+        elif known_scaled_type == 'complete' and count_false_known_column > 0:
             # All the values: fixed and not fixed will be scale, however
             # just the un fixed will be used and then the fixed will be
             # the same.
