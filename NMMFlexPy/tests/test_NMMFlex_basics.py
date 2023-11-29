@@ -659,8 +659,8 @@ class test_NMMFlex_basics(unittest.TestCase):
         self.assertTrue(np.all(w_new[:, [1, 2]] > 0) and
                         std_first_column > 0.0 and
                         std_second_column > 0.0 and
-                        round(w_new[2, 0], 3) == 0.383 and
-                        round(w_new[3, 0], 3) ==  1.361,
+                        round(w_new[2, 0], 3) == 0.399 and
+                        round(w_new[3, 0], 3) == 1.418,
                         'All unknown variables are greater than zero and... ')
 
     def test_calculate_divergence_equal_matrix(self):

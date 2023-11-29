@@ -7,7 +7,7 @@
 #         Kimura, and Hiroshi Sawada
 # License: Released under GNU Public License (GPL)
 
-__version__ = '0.1.16'
+__version__ = '0.1.17'
 __author__ = 'Crhistian Cardona <crhisto@gmail.com>'
 
 import math
@@ -253,7 +253,7 @@ class factorization:
                                    partial_h_fixed=None,
                                    w_mask_fixed=None,
                                    h_mask_fixed=None,
-                                   scale_w_unfixed_col=True,
+                                   scale_w_unfixed_col='partial',
                                    batches_partial_fixed=1,
                                    constraint_type_w=None,
                                    constraint_value_w=None,
@@ -328,9 +328,9 @@ class factorization:
             h_mask_fixed (np.ndarray, optional): A mask matrix for H defining
                 the positions that are fixed with TRUE values. If None, no
                 mask is applied. Defaults to None.
-            scale_w_unfixed_col (bool, optional): Whether to apply a
+            scale_w_unfixed_col (String, optional): Whether to apply a
                 scale constraint to the unfixed columns in matrix W.
-            Default is True.
+            Default is partial but can be complete, just_unknown or None.
             batches_partial_fixed (int, optional): Defines the number of
                 batches where the procedure will inject again the partially
                 fixed matrices. Defaults to 1.
@@ -1181,7 +1181,7 @@ class factorization:
                                                      is_sparse=False,
                                                      constraint_type_w=None,
                                                      constraint_value_w=None,
-                                                     scale_w_unfixed_col=True,
+                                                     scale_w_unfixed_col='partial',
                                                      w_mask_fixed=None):
         """
         This function calculates a new 'w' matrix using a generic variant of an
@@ -1234,9 +1234,9 @@ class factorization:
                 be used.
             is_sparse (bool, optional): A flag to determine whether to perform
                 the sparse or regular computation. Default is False.
-            scale_w_unfixed_col (bool, optional): Whether to apply a
+            scale_w_unfixed_col (String, optional): Whether to apply a
                 scale constraint to the unfixed columns in matrix W.
-                Default is True.
+                Default is partial, but can be complete, just_unknown or None.
             w_mask_fixed (np.ndarray, optional): A mask matrix for W defining
                 the positions that are fixed with TRUE values. If None, no
                 mask is applied. Defaults to None.
@@ -1273,11 +1273,14 @@ class factorization:
 
         # The main idea is to scale the unknown columns without centering the
         # the values.
-        if scale_w_unfixed_col and w_mask_fixed is not None:
+        if scale_w_unfixed_col is not None and w_mask_fixed is not None:
             # print('scale_w_unfixed_col is Active with _reference_scale_w.')
             # print('Class of w_new:', type(w_new).__name__)
             # Assign the new scale reference to the w_new variable
-            w_new = self._reference_scale_w(w=w_new, w_mask_fixed=w_mask_fixed)
+            w_new = self._reference_scale_w(
+                w=w_new,
+                w_mask_fixed=w_mask_fixed,
+                known_scaled_type=scale_w_unfixed_col)
 
         return w_new
 
@@ -1336,7 +1339,7 @@ class factorization:
         # 4. Create the mask with all true
         mask_with_unknown = np.ones(np.shape(w), dtype=bool)
 
-        #print("known_scaled_type: ", known_scaled_type)
+        print("known_scaled_type: ", known_scaled_type)
         if known_scaled_type == 'partial' and count_false_known_column > 0:
             for column in known_column_index:
                 column_mask_pattern = w_mask_fixed.iloc[:, column]
