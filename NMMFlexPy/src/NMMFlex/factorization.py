@@ -1339,7 +1339,7 @@ class factorization:
         # 4. Create the mask with all true
         mask_with_unknown = np.ones(np.shape(w), dtype=bool)
 
-        print("known_scaled_type: ", known_scaled_type)
+        #print("known_scaled_type: ", known_scaled_type)
         if known_scaled_type == 'partial' and count_false_known_column > 0:
             for column in known_column_index:
                 column_mask_pattern = w_mask_fixed.iloc[:, column]
