@@ -575,7 +575,8 @@ class factorization:
               ', constraint_type_w: ', constraint_type_w,
               ', constraint_value_w: ', constraint_value_w,
               ', constraint_type_a: ', constraint_type_a,
-              ', constraint_value_a: ', constraint_value_a)
+              ', constraint_value_a: ', constraint_value_a,
+              ', scale_w_unfixed_col: ', scale_w_unfixed_col)
 
         # Creating the dynamic variables with the correct sizing.
         x_hat = np.zeros(shape=(np.shape(x)))
