@@ -40,14 +40,14 @@ Both versions of the algorithm aim to factorize a given matrix into two non-nega
 
 ## Installation and Guidance
 For each version, you'll find a dedicated subdirectory that offers comprehensive instructions and practical usage examples:
-- [NMMFlexPy](./NMMFlexPy/src/README.md): For the Python implementation.
-- [NMMFlexR](./NMMFlexR/): For the R wrapper.
+- [NMMFlexPy](github.com/crhisto/NMMFlex/NMMFlexPy/): For the Python implementation. (Currently under development)
+- [NMMFlexR](github.com/crhisto/NMMFlex/NMMFlexR/): For the R wrapper. (Currently under development)
 
 Please navigate to the specific README files in these subdirectories for step-by-step installation guidelines and detailed usage instructions.
 
 ## Citing our Work
 If this NMMF implementation proves valuable for your research or projects, we kindly ask you to cite the original work in your publications and also our publication, as per the following:
-- Cardona, C., & Schweikert, G. et al (2023). DecoFlex: a flexible joined cell-type decomposition with multiomic epigenetic data. bioRxiv. https://doi.org/10.1101/xxxxxx
+- Cardona, C., & Schweikert, G. et al (2023). DecoFlex: a flexible joined cell-type decomposition with multiomic epigenetic data. (Manuscript in the process of review for submission and forthcoming publication).
 - Takeuchi, M., Igarashi, Y., & Tanaka, T. (2013). [Non-Negative Multiple Matrix Factorization](https://www.ijcai.org/Proceedings/13/Papers/254.pdf). Proceedings of the Twenty-Third International Joint Conference on Artificial Intelligence. 2013
 
 ## Contributing
