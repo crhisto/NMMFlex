@@ -41,7 +41,7 @@ from NMMFlex import factorization, grid_search
 # Use the functionalities provided by NMMFlex
 ```
 
-For detailed documentation, please refer to the [NMMFlex Documentation](https://www.github.com/crhisto/NMMFlex/NMMFlexPy/NMMFlex/docs/build/index.html).
+For detailed documentation, please refer to the [NMMFlex Documentation](https://html-preview.github.io/?url=https://github.com/crhisto/NMMFlex/blob/main/NMMFlexPy/src/docs/build/index.html).
 
 ## Running the main deconvolution function
 
