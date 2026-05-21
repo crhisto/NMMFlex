@@ -1,2 +1,20 @@
-
 NMMFlexPy/.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Virtual envs
+.venv/
+venv/
+
+# Test / coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# macOS
+.DS_Store
