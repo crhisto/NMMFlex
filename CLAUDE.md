@@ -30,6 +30,12 @@ this repository. Read it at the start of every session.
    Never `git add -A` or `git add .` — the gitignore may not yet cover
    everything, and accidental inclusion of `.venv/` or caches is a
    common source of noise.
+7. **Check the README before every commit and push.** For each pending
+   change, ask: does this make any part of the root `README.md` or
+   `NMMFlexPy/src/README.md` stale (install instructions, dependency
+   lists, public API, links, dev workflow, CI description)? If yes,
+   propose the README update before — or alongside — the commit.
+   Don't push commits that leave the README contradicting the code.
 
 ## Project structure quick reference
 

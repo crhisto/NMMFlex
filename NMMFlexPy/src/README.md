@@ -18,18 +18,31 @@ You can install NMMFlexPy using pip:
 pip install NMMFlex
 ```
 
-NMMFlexPy requires the following dependencies, which will be installed automatically:
+NMMFlexPy requires the following runtime dependencies, which will be installed automatically:
 
 - numpy>=1.24.3
 - pandas>=2.0.2
 - pyparsing>=3.0.7
 - scipy>=1.10.1
 - deprecation>=2.1.0
-- sphinx>=7.0.1
 - scikit-learn>=1.2.2
-- setuptools>=67.8.0
-- pytest>=7.3.1
-- pytest-cov>=4.1.0
+
+Python 3.9 or newer is required (CI exercises 3.9, 3.10, 3.11, and 3.12).
+
+### Optional extras
+
+```shell
+pip install NMMFlex[torch]   # GPU/PyTorch backend dependencies
+pip install NMMFlex[docs]    # sphinx, for building the documentation
+pip install NMMFlex[dev]     # pytest, pytest-cov, ruff, torch, sphinx
+```
+
+If you are developing inside this repository, use the pinned dev
+requirements instead:
+
+```shell
+pip install -r NMMFlexPy/requirements-dev.txt
+```
 
 ## Usage
 
@@ -198,8 +211,12 @@ pip install pytest pytest-cov
 With pytest and pytest-cov installed, you can generate the code coverage report by executing the following command from the directory `[relative_path]/NMMFlexPy`:
 
 ```shell
-pytest --cov=src tests/test_suite.py --cov-report=html
+PYTHONPATH=src pytest --cov=src tests/ --cov-report=html
 ```
+
+The previous `tests/test_suite.py` wrapper double-collected every
+test and is no longer the entry point; pointing pytest at the
+`tests/` directory directly is what CI now does too.
 
 ## CI Pipeline
 
