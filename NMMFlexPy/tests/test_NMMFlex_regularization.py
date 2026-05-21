@@ -67,7 +67,8 @@ class test_NMMFlex_regularization(unittest.TestCase):
                         'The matrix was not quantile normalized.')
 
     def test_standardization(self):
-        results = self.dec.normalization(self.bulk_methylation_matrix, type)
+        results = self.dec.normalization(self.bulk_methylation_matrix,
+                                         'centered_norm_zero_min_max')
         check_results = np.all((results >= 0) & (results <= 1))
 
         self.assertTrue(check_results,

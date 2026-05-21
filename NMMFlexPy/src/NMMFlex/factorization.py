@@ -953,12 +953,12 @@ class factorization:
 
         h_proportions = None
 
-        # This is temp, since I think always that I activate the constrain
-        # all cell-types must sum up to 1, however I leave open the
-        # possibility of summing up to 1 just the known cell-types which at
-        # the first glance doesn't make sense. In the future I will delete
-        # the extended part.
-        if not known_proportions_constrain:
+        # When a mask is supplied, only the known rows should be
+        # renormalized to sum to 1 (the unknown rows are left as-is).
+        # When no mask is supplied, normalize the whole H column-wise.
+        # The legacy `known_proportions_constrain` flag is kept for
+        # backwards compatibility but is now implied by the mask.
+        if h_mask_fixed is None:
             h_proportions = h / h.sum(axis=0)
         else:
 
@@ -1376,8 +1376,11 @@ class factorization:
         else:
             mask_with_unknown[:, known_column_index] = False
 
-        # 6. I add the w reference to replace in it the scaled values
-        w_reference = w
+        # 6. Copy so we never mutate the caller's `w` and so numpy
+        # doesn't complain about read-only destinations from upstream
+        # views (pandas / sklearn return read-only arrays in newer
+        # versions).
+        w_reference = w.copy()
 
         # 5. Reassign the data to the H matrix
         np.putmask(w_reference,
@@ -1399,11 +1402,13 @@ class factorization:
             scaled_matrix = preprocessing.scale(matrix, axis=0,
                                                 with_mean=False, with_std=True)
         elif version_scale == '3':
-            scaled_matrix = matrix
-            for counter_columns in range(np.shape(matrix)[1]):
-                rms = np.sqrt(np.mean(matrix[:, counter_columns] ** 2))
-                scaled_matrix[:, counter_columns] = scaled_matrix[:,
-                                                    counter_columns] / rms
+            # Copy so we don't mutate the caller's array, and so we
+            # don't fail when pandas/sklearn hand us a read-only view.
+            scaled_matrix = np.array(matrix, dtype=float, copy=True)
+            for counter_columns in range(np.shape(scaled_matrix)[1]):
+                rms = np.sqrt(np.mean(scaled_matrix[:, counter_columns] ** 2))
+                scaled_matrix[:, counter_columns] = (
+                    scaled_matrix[:, counter_columns] / rms)
 
         # print('Matrix scaled:', np.shape(scaled_matrix))
         # print(scaled_matrix)
@@ -1971,7 +1976,8 @@ class factorization:
     def _calculate_h_new_extended_alpha_beta_generic(self, x, x_hat, w, h,
                                                      alpha, y, y_hat, a,
                                                      proportion_constraint,
-                                                     is_sparse, h_mask_fixed):
+                                                     is_sparse,
+                                                     h_mask_fixed=None):
         """
         This function calculates an updated version of the matrix 'h'
         considering an additional constraint on 'alpha' and potentially dealing
