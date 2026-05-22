@@ -267,8 +267,14 @@ class factorization:
 
         # The optimization is going to end until we reach a good fit or a
         # max number of iterations.
+        # `<` matches the multi-matrix entry point's loop bound
+        # (run_deconvolution_multiple uses `iterations < max_iterations`).
+        # Previously this loop used `<=` and silently ran one extra
+        # iteration vs the multi-matrix path -- caught by the
+        # paper-conformance test that asserts the two paths produce
+        # identical W/H when alpha = beta = 0.
         while abs(delta_divergence_value) > delta_threshold and \
-                iterations <= max_iterations:
+                iterations < max_iterations:
             # Reconstruction X̂ = W @ H.
             x_hat = _ops.calculate_x_hat(w, h)
 

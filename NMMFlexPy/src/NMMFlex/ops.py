@@ -9,6 +9,62 @@ functions in ``torch_backend.py``. The older module is kept for
 backwards compatibility with the original parity tests, but new code
 should import from here.
 
+Mapping to Takeuchi et al. 2013
+-------------------------------
+
+This module implements the Non-Negative Multiple Matrix Factorization
+update rules from:
+
+    Takeuchi, Ishiguro, Kimura, Sawada. "Non-Negative Multiple
+    Matrix Factorization". IJCAI 2013.
+    https://www.ijcai.org/Proceedings/13/Papers/254.pdf
+
+Notation map (paper symbol -> code symbol):
+
+    X (target)               in R+^(I x J)     <->   x
+    Y (row-wise auxiliary)   in R+^(N x J)     <->   y
+    Z (column-wise auxiliary) in R+^(I x M)    <->   z
+    W (basis)                in R+^(I x K)     <->   w
+    H (coefficients)         in R+^(K x J)     <->   h
+    A (aux. basis)           in R+^(N x K)     <->   a
+    B (aux. coefficients)    in R+^(K x M)     <->   b
+    alpha (Y-coupling)       Eq. 3             <->   alpha
+    beta  (Z-coupling)       Eq. 3             <->   beta
+
+Reconstructions (Eq. 2):
+
+    x_hat = W @ H        y_hat = A @ H        z_hat = W @ B
+
+Loss (Eq. 3, 4) is the generalized KL divergence:
+
+    D(X, Y, Z | W, H, A, B; alpha, beta)
+        = D(X | W H) + alpha * D(Y | A H) + beta * D(Z | W B)
+    d_gKL(x | x_hat) = x * log(x / x_hat) - x + x_hat
+
+Paper-vs-code note: the printed update rules in the paper (Eqs.
+7, 8, 9, and 23) carry consistent index typos that disagree with
+the auxiliary-variable derivation in Appendix A (Eqs. 20-22).
+Specifically the published Eq. 7/23 prints
+
+    ... z_{k,m} / z_hat_{k,m} * b_{i,m} ...
+
+but Z is indexed (i, m), B is indexed (k, m), and the inner sum
+runs over m -- so the term must be
+
+    ... z_{i,m} / z_hat_{i,m} * b_{k,m} ...
+
+Similarly Eq. 8 prints ``w_{k,j}`` where the correct index from the
+appendix is ``w_{i,k}``. The implementation below follows the
+*corrected* derivation, not the typeset formulas. A noise-free
+reconstruction test plus a divergence-monotonicity test under
+``tests/test_paper_conformance.py`` pin this down.
+
+Beyond the paper: the implementation also supports a ``gamma``
+scalar weight on the X term (run_deconvolution_multiple), a
+proportion constraint on H, an alpha_regularizer_w soft-binary
+penalty, fixed/partial-fixed matrices, and a post-step W
+regularizer. None of these are in Takeuchi 2013.
+
 Conventions (same as ``factorization.py``):
     X has shape (I, J)         observed matrix
     W has shape (I, K)         factor (signatures)
