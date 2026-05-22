@@ -1655,80 +1655,11 @@ class factorization:
 
         # TODO: Apply a constraint to ensure that the value of beta is within
         #  the range of 0 and 1.
-        w_new = np.zeros(shape=(np.shape(w)))
-
-        # The input X and Y must be sparse always
-        if type(x) is not csr_matrix:
-            x = csr_matrix(x)
-        if type(z) is not csr_matrix and z is not None:
-            z = csr_matrix(z)
-
-        for i in range(np.shape(w)[0]):
-            for k in range(np.shape(w)[1]):
-                up_temp = 0
-                up_temp_first = 0
-                for j in range(np.shape(h)[1]):
-                    up_temp_first_complement = (x[i, j] /
-                                                x_hat[i][j]) * h[k][j]
-                    if not math.isnan(up_temp_first_complement):
-                        up_temp_first = up_temp_first + \
-                                        up_temp_first_complement
-
-                # In case that we are running a simple NMF with beta=0
-                # I shouldn't run the code.
-                up_temp_second = 0
-                if beta != 0:
-                    for m in range(np.shape(b)[1]):
-                        # Verify the equation in this part. The original paper
-                        # (Takeuchi et al, 2013) has an issue where i and k are
-                        # reversed, which seems incorrect.
-                        up_temp_second_complement = self.division(
-                            z[i, m], z_hat[i][m]) * b[k][m]
-
-                        if not math.isnan(up_temp_second_complement):
-                            up_temp_second = up_temp_second + \
-                                             up_temp_second_complement
-
-                up_temp = up_temp_first + (beta * up_temp_second)
-
-                down_temp = 0
-                down_temp_first = 0
-                for j in range(np.shape(h)[1]):
-                    if not math.isnan(h[k][j]):
-                        down_temp_first = down_temp_first + h[k][j]
-
-                down_temp_second = 0
-                if beta != 0:
-                    for m in range(np.shape(b)[1]):
-                        if not math.isnan(b[k][m]):
-                            down_temp_second = down_temp_second + b[k][m]
-
-                regularization_part = 0
-                if alpha_regularizer_w != 0:
-                    regularizer_function_type = 'medecom_soft_binary'
-
-                    if regularizer_function_type == 'lasso_sparcity':
-                        # Sparcity
-                        regularization_part = alpha_regularizer_w * 1
-                    elif regularizer_function_type == 'medecom_soft_binary':
-                        # Direct regularizator from MeDeCom
-                        if not math.isnan(w[i][k]):
-                            regularization_part = alpha_regularizer_w * \
-                                                  (w[i][k] * (1 - w[i][k]))
-                    elif regularizer_function_type == \
-                            'medecom_soft_binary_derived':
-                        # Derived regularizator from MeDeCom: based on the
-                        # function x(1-x)
-                        if not math.isnan(w[i][k]):
-                            regularization_part = alpha_regularizer_w * \
-                                                  (1 - 2 * w[i][k])
-
-                down_temp = down_temp_first + \
-                            (beta * down_temp_second) + \
-                            regularization_part
-
-                if not math.isnan(w[i][k]):
-                    w_new[i][k] = w[i][k] * self.division(up_temp, down_temp)
+        w_new = _ops.calculate_w_new_alpha_beta_sparse(
+            x, x_hat, w, h,
+            beta=beta, z=z, z_hat=z_hat, b=b,
+            alpha_regularizer_w=alpha_regularizer_w,
+        )
 
         if regularize_w is not None:
             # TODO: Test the _regularize_w function with sparse values to
@@ -2193,64 +2124,10 @@ class factorization:
         Updated matrix H based on X, X_hat, W, H, Y, Y_hat, A, and alpha.
         """
 
-        h_new = np.zeros(shape=(np.shape(h)))
-
-        # The input X and Y must be sparse always and at least X must be
-        # filled.
-        if type(x) is not csr_matrix:
-            x = csr_matrix(x)
-        if type(y) is not csr_matrix and y is not None:
-            y = csr_matrix(y)
-
-        for k in range(np.shape(h)[0]):
-            for j in range(np.shape(h)[1]):
-
-                up_temp = 0
-                up_temp_first = 0
-                for i in range(np.shape(x)[0]):
-                    # If the complementary part is not NaN
-                    up_temp_first_complement = (x[i, j] /
-                                                x_hat[i][j]) * w[i][k]
-                    if not math.isnan(up_temp_first_complement):
-                        up_temp_first = up_temp_first + \
-                                        up_temp_first_complement
-
-                # In case that we are running a simple model, we should avoid
-                # the calculation.
-                up_temp_second = 0
-                if alpha != 0:
-                    for n in range(np.shape(y)[0]):
-                        # If the complementary part is not NaN
-                        up_temp_second_complement = self.division(
-                            y[n, j], y_hat[n][j]) * a[n][k]
-
-                        if not math.isnan(up_temp_second_complement):
-                            up_temp_second = up_temp_second + \
-                                             up_temp_second_complement
-
-                up_temp = up_temp_first + (alpha * up_temp_second)
-
-                down_temp = 0
-                down_temp_first = 0
-                for i in range(np.shape(w)[0]):
-                    # I sum up if the value is not null
-                    if not math.isnan(w[i][k]):
-                        down_temp_first = down_temp_first + w[i][k]
-
-                down_temp_second = 0
-                if alpha != 0:
-                    for n in range(np.shape(y)[0]):
-                        # I sum up if the value is not null
-                        if not math.isnan(a[n][k]):
-                            down_temp_second = down_temp_second + a[n][k]
-
-                down_temp = down_temp_first + (alpha * down_temp_second)
-
-                if not math.isnan(h[k][j]):
-                    # I sum up if the value is not null
-                    h_new[k][j] = h[k][j] * self.division(up_temp, down_temp)
-
-        return h_new
+        return _ops.calculate_h_new_alpha_beta_sparse(
+            x, x_hat, w, h,
+            alpha=alpha, y=y, y_hat=y_hat, a=a,
+        )
 
     def _calculate_a_new_extended_generic(self, y, y_hat, a, h, is_sparse,
                                           constraint_type_a=None,
@@ -2395,34 +2272,7 @@ class factorization:
         The updated version of the 'a' matrix.
         """
 
-        a_new = np.zeros(shape=(np.shape(a)))
-
-        # The input X and Y must be sparse always
-        if type(y) is not csr_matrix:
-            y = csr_matrix(y)
-
-        for n in range(np.shape(y)[0]):
-            for k in range(np.shape(a)[1]):
-
-                up_temp = 0
-                for j in range(np.shape(y)[1]):
-                    up_temp_complement = self.division(y[n, j],
-                                                       y_hat[n][j]) * h[k][j]
-                    # If the complementary part is not NaN
-                    if not math.isnan(up_temp_complement):
-                        up_temp = up_temp + up_temp_complement
-
-                down_temp = 0
-                for j in range(np.shape(y)[1]):
-                    # I sum up if the value is not null
-                    if not math.isnan(h[k][j]):
-                        down_temp = down_temp + h[k][j]
-
-                # I sum up if the value is not null
-                if not math.isnan(a[n][k]):
-                    a_new[n][k] = a[n][k] * self.division(up_temp, down_temp)
-
-        return a_new
+        return _ops.calculate_a_new_sparse(y, y_hat, a, h)
 
     def _calculate_b_new_extended_generic(self, z, z_hat, b, w, is_sparse):
         """
@@ -2543,34 +2393,7 @@ class factorization:
         The updated version of the 'b' matrix.
         """
 
-        b_new = np.zeros(shape=(np.shape(b)))
-
-        # The input Z must be sparse always
-        if type(z) is not csr_matrix:
-            z = csr_matrix(z)
-
-        for k in range(np.shape(b)[0]):
-            for m in range(np.shape(b)[1]):
-
-                up_temp = 0
-                for i in range(np.shape(z)[0]):
-                    up_temp_complement = self.division(z[i, m],
-                                                       z_hat[i][m]) * w[i][k]
-                    # If the complementary part is not NaN
-                    if not math.isnan(up_temp_complement):
-                        up_temp = up_temp + up_temp_complement
-
-                down_temp = 0
-                for i in range(np.shape(z)[0]):
-                    # I sum up if the value is not null
-                    if not math.isnan(w[i][k]):
-                        down_temp = down_temp + w[i][k]
-
-                # I sum up if the value is not null
-                if not math.isnan(b[k][m]):
-                    b_new[k][m] = b[k][m] * self.division(up_temp, down_temp)
-
-        return b_new
+        return _ops.calculate_b_new_sparse(z, z_hat, b, w)
 
     def _calculate_divergence_generic(self, x, x_hat, is_sparse):
         """

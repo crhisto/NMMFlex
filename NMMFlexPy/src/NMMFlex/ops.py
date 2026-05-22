@@ -18,6 +18,8 @@ Conventions (same as ``factorization.py``):
 
 from __future__ import annotations
 
+import numpy as np
+
 from . import _backend as B
 
 
@@ -181,3 +183,82 @@ def calculate_b_new(z, z_hat, b, w):
     den = B.sum(w, axis=0)
     factor = B.safe_divide(num, B.expand_dims(den, 1))
     return b * factor
+
+
+# ---------------------------------------------------------------------------
+# Sparse / NaN-tolerant variants
+#
+# The legacy ``_calculate_*_extended_*_sparse`` methods do two things on
+# top of the dense path:
+#   1. Accept scipy.sparse (csr_matrix) inputs for the observed
+#      matrices X / Y / Z and call ``.toarray()``-equivalent indexing.
+#   2. Skip NaN values in any of the inputs (numerator term, h[k,j],
+#      w[i,k], b[k,m], etc.) instead of letting them propagate.
+#
+# The cleanest vectorized form is to:
+#   - Materialize sparse inputs to dense via .toarray() (the original
+#     loop iterates every (i,j) position anyway, so the memory profile
+#     is unchanged).
+#   - Replace NaN with 0 in every input.
+#   - Reuse the dense ops above.
+#
+# NaN-as-0 in a *sum* gives the same answer as skipping NaN terms
+# (because NaN + non-NaN-contribution becomes 0 + non-NaN). For the
+# final assignment ``W_new = W * factor`` the NaN positions in W stay
+# 0 in the output, matching the loop version's behaviour (which guards
+# the write with ``if not math.isnan(w[i][k])`` and leaves the
+# pre-zeroed value in place).
+# ---------------------------------------------------------------------------
+
+def _prep_sparse(*arrays):
+    """Coerce each input to a dense numpy array with NaN → 0.
+    ``None`` passes through unchanged so callers can pass optional
+    arguments straight in."""
+    out = []
+    for arr in arrays:
+        if arr is None:
+            out.append(None)
+            continue
+        if hasattr(arr, "toarray"):
+            arr = arr.toarray()
+        arr = np.nan_to_num(np.asarray(arr, dtype=float), nan=0.0)
+        out.append(arr)
+    return out
+
+
+def calculate_w_new_alpha_beta_sparse(x, x_hat, w, h, beta=0.0,
+                                       z=None, z_hat=None, b=None,
+                                       alpha_regularizer_w=0.0):
+    """Sparse / NaN-tolerant variant of
+    ``calculate_w_new_alpha_beta``."""
+    x, x_hat, w, h = _prep_sparse(x, x_hat, w, h)
+    z, z_hat, b = _prep_sparse(z, z_hat, b)
+    return calculate_w_new_alpha_beta(
+        x, x_hat, w, h,
+        beta=beta, z=z, z_hat=z_hat, b=b,
+        alpha_regularizer_w=alpha_regularizer_w,
+    )
+
+
+def calculate_h_new_alpha_beta_sparse(x, x_hat, w, h, alpha=0.0,
+                                       y=None, y_hat=None, a=None):
+    """Sparse / NaN-tolerant variant of
+    ``calculate_h_new_alpha_beta``."""
+    x, x_hat, w, h = _prep_sparse(x, x_hat, w, h)
+    y, y_hat, a = _prep_sparse(y, y_hat, a)
+    return calculate_h_new_alpha_beta(
+        x, x_hat, w, h,
+        alpha=alpha, y=y, y_hat=y_hat, a=a,
+    )
+
+
+def calculate_a_new_sparse(y, y_hat, a, h):
+    """Sparse / NaN-tolerant variant of ``calculate_a_new``."""
+    y, y_hat, a, h = _prep_sparse(y, y_hat, a, h)
+    return calculate_a_new(y, y_hat, a, h)
+
+
+def calculate_b_new_sparse(z, z_hat, b, w):
+    """Sparse / NaN-tolerant variant of ``calculate_b_new``."""
+    z, z_hat, b, w = _prep_sparse(z, z_hat, b, w)
+    return calculate_b_new(z, z_hat, b, w)
