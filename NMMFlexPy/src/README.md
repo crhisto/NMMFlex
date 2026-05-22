@@ -86,6 +86,22 @@ equivalent.
 
 For detailed documentation, please refer to the [NMMFlex Documentation](https://html-preview.github.io/?url=https://github.com/crhisto/NMMFlex/blob/main/NMMFlexPy/src/docs/build/index.html).
 
+### Backend performance
+
+End-to-end timing of `run_deconvolution_multiple` (50 multiplicative-update iterations, dense alpha/beta path), measured on an Apple Silicon Mac (M-series, no CUDA available):
+
+| Shape (I × J × K) | numpy | torch f64 CPU | torch f32 CPU | torch f32 MPS |
+|---|---:|---:|---:|---:|
+| 200 × 50 × 5 (small) | 7 ms | 6 ms (1.2×) | 6 ms (1.2×) | 48 ms (0.2×) |
+| 5000 × 200 × 10 (omics-ish) | 661 ms | 303 ms (2.2×) | 175 ms (3.8×) | 103 ms (6.4×) |
+| 20000 × 500 × 20 (large) | 7037 ms | 3122 ms (2.3×) | 1766 ms (4.0×) | 1349 ms (5.2×) |
+
+Notes:
+
+- The numpy baseline is already vectorized BLAS — it is *not* the slow triple-loop code we shipped from 0.1.0.
+- For small problems the GPU launch overhead dominates and torch MPS is slower than numpy. Use the torch backend when your input is large enough that the matrix multiplies are the bottleneck.
+- CUDA was not available in the benchmark environment; we expect a CUDA RTX-class GPU to widen the gap meaningfully at the large shape and to dominate batched grid-search workloads. Reproduce locally with `pip install NMMFlex[torch]` + `python NMMFlexPy/benchmarks/bench_run_deconvolution.py`.
+
 ## Running the main deconvolution function
 
 The `run_deconvolution_multiple` function is part of the `NMMFlex` class and is designed to perform matrix deconvolution using three input matrices, `x_matrix`, `y_matrix`, and `z_matrix`, and a rank, `k`. 
