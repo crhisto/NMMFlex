@@ -129,30 +129,85 @@ def test_run_deconvolution_numpy_vs_torch_match():
 
 
 @pytest.mark.skipif(not B.has_torch(), reason="torch not installed")
-def test_run_deconvolution_multiple_warns_for_torch_backend(capsys):
-    """The multi-matrix path warns about no-op backend and still
-    runs on numpy without crashing."""
-    f = factorization(backend='torch', device='cpu')
+def test_run_deconvolution_multiple_torch_matches_numpy():
+    """End-to-end parity for the multi-matrix path on the
+    torch-eligible config (dense X, no Y/Z coupling, no fixed
+    matrices, no masks, no regularize_w). For the same input and
+    same initial W/H, the torch backend should produce W and H
+    matching the numpy backend within float64 tolerance.
+    """
+    import pandas as pd
+
     rng = np.random.default_rng(0)
-    x = rng.uniform(0.1, 1.0, size=(8, 5))
+    I, J, K = 10, 5, 2
+    x = pd.DataFrame(rng.uniform(0.1, 1.0, size=(I, J)))
 
-    with warnings.catch_warnings(record=True) as caught:
-        warnings.simplefilter("always")
-        try:
-            f.run_deconvolution_multiple(
-                x_matrix=x, y_matrix=None, z_matrix=None, k=2,
-                max_iterations=2, print_limit=1000, verbose=False,
-            )
-        except Exception:
-            # The multi-matrix path has lots of code we haven't ported;
-            # the contract for this test is only that the warning was
-            # raised before any backend-related crash. If the function
-            # bombs out for unrelated reasons that's a separate test.
-            pass
+    # Pre-generate the initial W and H so both runs start identically.
+    w0 = rng.uniform(0.1, 1.0, size=(I, K))
+    h0 = rng.uniform(0.1, 1.0, size=(K, J))
 
-    backend_warnings = [
-        w for w in caught
-        if issubclass(w.category, RuntimeWarning)
-        and "not yet honoured" in str(w.message)
-    ]
-    assert backend_warnings, "expected a RuntimeWarning about backend fallback"
+    # numpy run, with a hook that swaps _initialize_matrix for our
+    # fixed seeds (so we get deterministic parity, not just close).
+    f_np = factorization(backend='numpy')
+
+    def _init_np(size_rows, size_columns, **_):
+        if (size_rows, size_columns) == (I, K):
+            return w0.copy()
+        if (size_rows, size_columns) == (K, J):
+            return h0.copy()
+        raise AssertionError(f"unexpected init shape {(size_rows, size_columns)}")
+
+    f_np._initialize_matrix = _init_np  # noqa: SLF001
+    f_np.run_deconvolution_multiple(
+        x_matrix=x, y_matrix=None, z_matrix=None, k=K,
+        gamma=1.0, alpha=0.0, beta=0.0,
+        delta_threshold=1e-12, max_iterations=5,
+        proportion_constraint_h=True,
+        fixed_w=None,
+        verbose=False, print_limit=1000,
+    )
+
+    # torch run with the same initial matrices.
+    f_t = factorization(backend='torch', device='cpu')
+    f_t._initialize_matrix = _init_np  # noqa: SLF001
+    f_t.run_deconvolution_multiple(
+        x_matrix=x, y_matrix=None, z_matrix=None, k=K,
+        gamma=1.0, alpha=0.0, beta=0.0,
+        delta_threshold=1e-12, max_iterations=5,
+        proportion_constraint_h=True,
+        fixed_w=None,
+        verbose=False, print_limit=1000,
+    )
+
+    np.testing.assert_allclose(
+        np.asarray(f_t.w.values), np.asarray(f_np.w.values), atol=1e-10
+    )
+    np.testing.assert_allclose(
+        np.asarray(f_t.h.values), np.asarray(f_np.h.values), atol=1e-10
+    )
+
+
+@pytest.mark.skipif(not B.has_torch(), reason="torch not installed")
+def test_run_deconvolution_multiple_torch_falls_back_when_ineligible():
+    """When config touches an unsupported knob (e.g. regularize_w),
+    backend='torch' should silently fall back to numpy and still
+    return a populated result -- not crash."""
+    import pandas as pd
+
+    rng = np.random.default_rng(2)
+    I, J, K = 8, 4, 2
+    x = pd.DataFrame(rng.uniform(0.1, 1.0, size=(I, J)))
+
+    f = factorization(backend='torch', device='cpu')
+    f.run_deconvolution_multiple(
+        x_matrix=x, y_matrix=None, z_matrix=None, k=K,
+        gamma=1.0, alpha=0.0, beta=0.0,
+        delta_threshold=1e-6, max_iterations=3,
+        proportion_constraint_h=True,
+        fixed_w=None,
+        regularize_w='norm_zero_min_max',
+        verbose=False, print_limit=1000,
+    )
+
+    assert f.w is not None
+    assert f.h is not None

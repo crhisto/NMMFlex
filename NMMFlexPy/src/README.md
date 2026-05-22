@@ -75,11 +75,14 @@ f = factorization(backend='torch', device='cuda')
 f = factorization(backend='torch', device='mps')
 ```
 
-As of this release the `backend='torch'` switch is honoured by the
-simple `run_deconvolution(x, k)` path. The multi-matrix
-`run_deconvolution_multiple` still uses numpy internally regardless
-of the flag (it warns when called with a non-numpy backend); torch
-coverage there is being widened incrementally.
+`backend='torch'` is honoured by both `run_deconvolution(x, k)` and
+`run_deconvolution_multiple(...)` for the common dense alpha/beta
+case (no sparse inputs, no fixed matrices, no W/H masks, no
+`regularize_w`). When any of those edge-case knobs are set, the
+torch path silently falls back to numpy for that call — those
+internal paths still rely on `np.putmask`, pandas DataFrame
+operations, and `scipy.sparse` semantics that have no cheap torch
+equivalent.
 
 For detailed documentation, please refer to the [NMMFlex Documentation](https://html-preview.github.io/?url=https://github.com/crhisto/NMMFlex/blob/main/NMMFlexPy/src/docs/build/index.html).
 

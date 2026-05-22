@@ -493,20 +493,13 @@ class factorization:
 
         """
         print(__version__)
-        # Backend coverage note: the multi-matrix path still relies on
-        # numpy/scipy primitives for sparse handling, fixed-matrix
-        # masking, regularization, and the alpha/beta update rules.
-        # Falling back to numpy here keeps the behaviour predictable
-        # until those internals are vectorized through ops/_backend.
-        if self._backend_name != 'numpy':
-            import warnings
-            warnings.warn(
-                "backend='%s' is not yet honoured by "
-                "run_deconvolution_multiple; falling back to numpy for "
-                "this call." % self._backend_name,
-                RuntimeWarning,
-                stacklevel=2,
-            )
+        # backend='torch' is honoured for the common alpha/beta path
+        # (dense inputs, no fixed matrices, no masks, no regularize_w).
+        # If any of those edge-case knobs are set, we transparently
+        # fall back to numpy for this call -- those paths still rely
+        # on np.putmask / pandas / scipy.sparse internals that have no
+        # cheap torch equivalent. The fallback is silent because users
+        # opted into 'torch' for the fast path, not the edge cases.
 
         # 1. Now It's time to convert the matrices in a format where Zero and
         # null values are treated differently.
@@ -690,13 +683,51 @@ class factorization:
         # Creating the dynamic variables with the correct sizing.
         x_hat = np.zeros(shape=(np.shape(x)))
 
+        # Torch path eligibility: only the common dense alpha/beta case
+        # is supported on the torch backend; anything that needs
+        # np.putmask, pandas operations, scipy.sparse, or
+        # `_regularize_w` stays on numpy. Eligibility is checked AFTER
+        # input standardization and initialization so we know the
+        # sparse flags and the initial matrices.
+        _torch_eligible = (
+            self._backend_name == 'torch'
+            and not self.is_x_sparse
+            and not self.is_y_sparse
+            and not self.is_z_sparse
+            and fixed_w is None and fixed_h is None
+            and fixed_a is None and fixed_b is None
+            and w_mask_fixed is None and h_mask_fixed is None
+            and partial_w_fixed is None and partial_h_fixed is None
+            and regularize_w is None
+        )
+
+        if _torch_eligible:
+            # Convert the operating matrices to the active backend
+            # (torch tensors on the configured device/dtype). Inputs
+            # x/y/z come out of standardization as pandas DataFrames;
+            # pull the .values into numpy first.
+            def _np(arr):
+                if arr is None:
+                    return None
+                if hasattr(arr, 'values'):
+                    return np.asarray(arr.values)
+                return np.asarray(arr)
+
+            x = self._to_backend(_np(x))
+            y = self._to_backend(_np(y)) if y is not None else None
+            z = self._to_backend(_np(z)) if z is not None else None
+            w = self._to_backend(w)
+            h = self._to_backend(h)
+            a = self._to_backend(a) if a is not None else None
+            b = self._to_backend(b) if b is not None else None
+
         iterations = 0
         divergence_value = 1
         delta_divergence_value = 1
         running_info = np.empty((0, 6), float)
         # The optimization is going to end until we reach a good fit or a max
         # number of iterations.
-        while np.abs(delta_divergence_value) > delta_threshold and \
+        while abs(delta_divergence_value) > delta_threshold and \
                 iterations < max_iterations:
 
             # Calculation of all related with X. In this case, if gamma is 0,
@@ -709,7 +740,12 @@ class factorization:
                 divergence_matrix_x = \
                     self._calculate_divergence_generic(x, x_hat,
                                                        self.is_x_sparse)
-                divergence_actual_value_x = np.sum(divergence_matrix_x)
+                # Use _B.to_python_float so the torch path collapses
+                # 0-D tensors to Python floats for the convergence
+                # metric -- the numpy path passes through unchanged.
+                divergence_actual_value_x = _B.to_python_float(
+                    _B.sum(divergence_matrix_x)
+                )
 
             divergence_matrix_y = None
             divergence_actual_value_y = -1
@@ -718,7 +754,9 @@ class factorization:
                 divergence_matrix_y = \
                     self._calculate_divergence_generic(y, y_hat,
                                                        self.is_y_sparse)
-                divergence_actual_value_y = np.sum(divergence_matrix_y)
+                divergence_actual_value_y = _B.to_python_float(
+                    _B.sum(divergence_matrix_y)
+                )
 
             divergence_matrix_z = None
             divergence_actual_value_z = -1
@@ -727,16 +765,20 @@ class factorization:
                 divergence_matrix_z = \
                     self._calculate_divergence_generic(z, z_hat,
                                                        self.is_z_sparse)
-                divergence_actual_value_z = np.sum(divergence_matrix_z)
+                divergence_actual_value_z = _B.to_python_float(
+                    _B.sum(divergence_matrix_z)
+                )
 
             # Calculation of total divergence with the multiple matrices
-            # including the gamma variable.
+            # including the gamma variable. All summands are now Python
+            # floats (see _B.to_python_float above) so the rest of the
+            # tracking arithmetic stays on plain Python / numpy.
             divergence_actual_value = (gamma * divergence_actual_value_x) + \
                                       (alpha * divergence_actual_value_y) + \
                                       (beta * divergence_actual_value_z)
 
-            delta_divergence_value = np.abs(divergence_actual_value -
-                                            divergence_value)
+            delta_divergence_value = abs(divergence_actual_value -
+                                          divergence_value)
             divergence_value = divergence_actual_value
 
             # Add an object with the values of iterations,
@@ -830,15 +872,33 @@ class factorization:
             iterations += 1
 
         print("The process finished!")
-        # Let's print the reason because the process finishes.
-        if np.abs(delta_divergence_value) < delta_threshold:
+        # delta_divergence_value is already a Python float (see the
+        # _B.to_python_float coercions inside the loop), so we use the
+        # builtin abs(). Avoids the numpy-only np.abs() call that
+        # would have errored on the torch backend's intermediate
+        # tensors before they were collapsed to floats.
+        if abs(delta_divergence_value) < delta_threshold:
             if verbose:
                 print("delta_threshold stop. Current limit: ", delta_threshold,
-                      ", Actual value: ", np.abs(delta_divergence_value))
+                      ", Actual value: ", abs(delta_divergence_value))
         else:
             if verbose:
                 print("Iterations stop. Current limit: ", max_iterations,
                       ", Actual value: ", iterations)
+
+        # If we ran on the torch backend, convert all tensors back to
+        # numpy before _assign_global_variables / DataFrame wrapping.
+        if _torch_eligible:
+            x = self._from_backend(x)
+            y = self._from_backend(y) if y is not None else None
+            z = self._from_backend(z) if z is not None else None
+            x_hat = self._from_backend(x_hat)
+            y_hat = self._from_backend(y_hat) if y_hat is not None and not isinstance(y_hat, np.ndarray) else y_hat
+            z_hat = self._from_backend(z_hat) if z_hat is not None and not isinstance(z_hat, np.ndarray) else z_hat
+            w_new = self._from_backend(w_new)
+            h_new = self._from_backend(h_new)
+            a_new = self._from_backend(a_new) if a_new is not None and not isinstance(a_new, np.ndarray) else a_new
+            b_new = self._from_backend(b_new) if b_new is not None and not isinstance(b_new, np.ndarray) else b_new
 
         if verbose:
             print('Final number of iterations: ', iterations, ' Divergence: ',
@@ -1133,7 +1193,10 @@ class factorization:
                 from the dot product of 'w' and 'h'.
         """
 
-        x_hat = w.dot(h)
+        # ``@`` performs matrix multiplication on numpy arrays, pandas
+        # DataFrames, and torch tensors. The legacy ``w.dot(h)`` worked
+        # for numpy/pandas but ``torch.Tensor.dot`` is 1D-only.
+        x_hat = w @ h
         return x_hat
 
     def _calculate_y_hat(self, a, h):
@@ -1157,7 +1220,7 @@ class factorization:
                 from the dot product of 'a' and 'h'.
         """
 
-        y_hat = a.dot(h)
+        y_hat = a @ h
         return y_hat
 
     def _calculate_z_hat(self, w, b):
@@ -1181,7 +1244,7 @@ class factorization:
                 from the dot product of 'w' and 'b'.
         """
 
-        z_hat = w.dot(b)
+        z_hat = w @ b
         return z_hat
 
     def _calculate_x_hat_extended(self, w, h):
@@ -2429,7 +2492,13 @@ class factorization:
         if is_sparse:
             divergence = self._calculate_divergence_sparse(x, x_hat)
         else:
-            divergence = x * np.log(x / x_hat) - x + x_hat
+            # Backend-agnostic: ``/`` and ``*`` work on both numpy and
+            # torch; only ``log`` needs dispatch. Matches the legacy
+            # ``x * np.log(x / x_hat) - x + x_hat`` formula exactly,
+            # including the (rare) case where x_hat has a zero --
+            # plain division yields inf/nan and propagates, which is
+            # the same behaviour as the original numpy line.
+            divergence = x * _B.log(x / x_hat) - x + x_hat
 
         return divergence
 
