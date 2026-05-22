@@ -70,3 +70,114 @@ def calculate_h_new(x, x_hat, w, h):
     den = B.sum(w, axis=0)
     factor = B.safe_divide(num, B.expand_dims(den, 1))
     return h * factor
+
+
+# ---------------------------------------------------------------------------
+# Coupled (alpha/beta) update rules.
+#
+# These are the methods that run inside ``run_deconvolution_multiple``.
+# Same multiplicative-update family as ``calculate_w_new`` /
+# ``calculate_h_new`` above, but with additional cross-matrix terms:
+#   - W is coupled to Z via the b factor (weighted by ``beta``).
+#   - H is coupled to Y via the a factor (weighted by ``alpha``).
+# When alpha == 0 / beta == 0 the extra terms vanish and the update
+# collapses to the basic ``calculate_w_new`` / ``calculate_h_new`` form.
+# ---------------------------------------------------------------------------
+
+def calculate_w_new_alpha_beta(x, x_hat, w, h, beta=0.0,
+                                z=None, z_hat=None, b=None,
+                                alpha_regularizer_w=0.0):
+    """Vectorized form of ``factorization._calculate_w_new_extended_alpha_beta``.
+
+        ratio_x       = X / X̂                  shape (I, J)
+        up_first      = ratio_x @ H.T           shape (I, K)
+        up_second     = (Z / Ẑ) @ B.T           shape (I, K)   (if beta != 0)
+        up            = up_first + beta * up_second
+        down_first    = H.sum(axis=1)           shape (K,)
+        down_second   = B.sum(axis=1)           shape (K,)     (if beta != 0)
+        regularizer   = alpha_reg * W * (1 - W) shape (I, K)   (medecom_soft_binary)
+        down          = down_first[None, :] + beta * down_second[None, :]
+                          + regularizer
+        W_new         = W * safe_divide(up, down)
+
+    Only the ``medecom_soft_binary`` regularizer is implemented because
+    that is the only branch the original loop body could ever reach
+    (``regularizer_function_type`` was hard-coded to that value).
+    """
+    ratio_x = B.safe_divide(x, x_hat)
+    up_first = ratio_x @ h.T
+    up = up_first
+
+    down_first = B.sum(h, axis=1)
+    down = B.expand_dims(down_first, 0)
+
+    if beta != 0 and z is not None and z_hat is not None and b is not None:
+        ratio_z = B.safe_divide(z, z_hat)
+        up = up_first + beta * (ratio_z @ b.T)
+        down_second = B.sum(b, axis=1)
+        down = down + beta * B.expand_dims(down_second, 0)
+
+    if alpha_regularizer_w != 0:
+        down = down + alpha_regularizer_w * (w * (1 - w))
+
+    factor = B.safe_divide(up, down)
+    return w * factor
+
+
+def calculate_h_new_alpha_beta(x, x_hat, w, h, alpha=0.0,
+                                y=None, y_hat=None, a=None):
+    """Vectorized form of ``factorization._calculate_h_new_extended_alpha_beta``.
+
+        ratio_x   = X / X̂                  shape (I, J)
+        up_first  = W.T @ ratio_x           shape (K, J)
+        up_second = A.T @ (Y / Ŷ)           shape (K, J)   (if alpha != 0)
+        up        = up_first + alpha * up_second
+        down_first  = W.sum(axis=0)         shape (K,)
+        down_second = A.sum(axis=0)         shape (K,)     (if alpha != 0)
+        down      = down_first[:, None] + alpha * down_second[:, None]
+        H_new     = H * safe_divide(up, down)
+    """
+    ratio_x = B.safe_divide(x, x_hat)
+    up = w.T @ ratio_x
+
+    down_first = B.sum(w, axis=0)
+    down = B.expand_dims(down_first, 1)
+
+    if alpha != 0 and y is not None and y_hat is not None and a is not None:
+        ratio_y = B.safe_divide(y, y_hat)
+        up = up + alpha * (a.T @ ratio_y)
+        down_second = B.sum(a, axis=0)
+        down = down + alpha * B.expand_dims(down_second, 1)
+
+    factor = B.safe_divide(up, down)
+    return h * factor
+
+
+def calculate_a_new(y, y_hat, a, h):
+    """Vectorized form of ``factorization._calculate_a_new_extended``.
+
+        ratio_y = Y / Ŷ                    shape (N, J)
+        num     = ratio_y @ H.T            shape (N, K)
+        den     = H.sum(axis=1)            shape (K,)
+        A_new   = A * safe_divide(num, den)  broadcasting den as a row
+    """
+    ratio = B.safe_divide(y, y_hat)
+    num = ratio @ h.T
+    den = B.sum(h, axis=1)
+    factor = B.safe_divide(num, B.expand_dims(den, 0))
+    return a * factor
+
+
+def calculate_b_new(z, z_hat, b, w):
+    """Vectorized form of ``factorization._calculate_b_new_extended``.
+
+        ratio_z = Z / Ẑ                    shape (I, M)
+        num     = W.T @ ratio_z            shape (K, M)
+        den     = W.sum(axis=0)            shape (K,)
+        B_new   = B * safe_divide(num, den)  broadcasting den as a column
+    """
+    ratio = B.safe_divide(z, z_hat)
+    num = w.T @ ratio
+    den = B.sum(w, axis=0)
+    factor = B.safe_divide(num, B.expand_dims(den, 1))
+    return b * factor

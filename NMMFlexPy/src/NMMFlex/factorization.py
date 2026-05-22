@@ -1583,64 +1583,11 @@ class factorization:
 
         # TODO: Apply a constraint to ensure that the value of beta remains
         #  between 0 and 1.
-        w_new = np.zeros(shape=(np.shape(w)))
-
-        for i in range(np.shape(w)[0]):
-            for k in range(np.shape(w)[1]):
-                up_temp = 0
-                up_temp_first = 0
-                for j in range(np.shape(h)[1]):
-                    up_temp_first = up_temp_first + \
-                                    self.division(x[i][j],
-                                                  x_hat[i][j]) * h[k][j]
-
-                # If running a simple NMF with beta=0, skip executing this
-                # code.
-                up_temp_second = 0
-                if beta != 0:
-                    for m in range(np.shape(b)[1]):
-                        # Verify the equation in this part. The original paper
-                        # (Takeuchi et al, 2013) has an issue where i and k are
-                        # reversed, which seems incorrect.
-                        up_temp_second = up_temp_second + \
-                                         self.division(z[i][m],
-                                                       z_hat[i][m]) * b[k][m]
-
-                up_temp = up_temp_first + (beta * up_temp_second)
-
-                down_temp = 0
-                down_temp_first = 0
-                for j in range(np.shape(h)[1]):
-                    down_temp_first = down_temp_first + h[k][j]
-
-                down_temp_second = 0
-                if beta != 0:
-                    for m in range(np.shape(b)[1]):
-                        down_temp_second = down_temp_second + b[k][m]
-
-                regularization_part = 0
-                if alpha_regularizer_w != 0:
-                    regularizer_function_type = 'medecom_soft_binary'
-
-                    if regularizer_function_type == 'lasso_sparcity':
-                        # Sparcity
-                        regularization_part = alpha_regularizer_w * 1
-                    elif regularizer_function_type == 'medecom_soft_binary':
-                        # Direct regularizator from MeDeCom
-                        regularization_part = alpha_regularizer_w * \
-                                              (w[i][k] * (1 - w[i][k]))
-                    elif regularizer_function_type == \
-                            'medecom_soft_binary_derived':
-                        # Derived regularizator from MeDeCom: based on
-                        # the function x(1-x)
-                        regularization_part = alpha_regularizer_w * \
-                                              (1 - 2 * w[i][k])
-
-                down_temp = down_temp_first + \
-                            (beta * down_temp_second) + \
-                            regularization_part
-
-                w_new[i][k] = w[i][k] * self.division(up_temp, down_temp)
+        w_new = _ops.calculate_w_new_alpha_beta(
+            x, x_hat, w, h,
+            beta=beta, z=z, z_hat=z_hat, b=b,
+            alpha_regularizer_w=alpha_regularizer_w,
+        )
 
         if regularize_w is not None:
             print('regularize_w is Active with regularization_type: ',
@@ -2196,43 +2143,10 @@ class factorization:
         possible.
         """
 
-        h_new = np.zeros(shape=(np.shape(h)))
-
-        for k in range(np.shape(h)[0]):
-            for j in range(np.shape(h)[1]):
-
-                up_temp = 0
-                up_temp_first = 0
-                for i in range(np.shape(x)[0]):
-                    up_temp_first = up_temp_first + \
-                                    (self.division(x[i][j],
-                                                   x_hat[i][j])) * w[i][k]
-
-                # Avoid the calculation if running a simple model.
-                up_temp_second = 0
-                if alpha != 0:
-                    for n in range(np.shape(y)[0]):
-                        up_temp_second = up_temp_second + \
-                                         self.division(y[n][j],
-                                                       y_hat[n][j]) * a[n][k]
-
-                up_temp = up_temp_first + (alpha * up_temp_second)
-
-                down_temp = 0
-                down_temp_first = 0
-                for i in range(np.shape(w)[0]):
-                    down_temp_first = down_temp_first + w[i][k]
-
-                down_temp_second = 0
-                if alpha != 0:
-                    for n in range(np.shape(y)[0]):
-                        down_temp_second = down_temp_second + a[n][k]
-
-                down_temp = down_temp_first + (alpha * down_temp_second)
-
-                h_new[k][j] = h[k][j] * (self.division(up_temp, down_temp))
-
-        return h_new
+        return _ops.calculate_h_new_alpha_beta(
+            x, x_hat, w, h,
+            alpha=alpha, y=y, y_hat=y_hat, a=a,
+        )
 
     def _calculate_h_new_extended_alpha_beta_sparse(self, x, x_hat, w, h,
                                                     alpha, y, y_hat, a):
@@ -2441,23 +2355,7 @@ class factorization:
         The updated version of the 'a' matrix.
         """
 
-        a_new = np.zeros(shape=(np.shape(a)))
-
-        for n in range(np.shape(y)[0]):
-            for k in range(np.shape(a)[1]):
-
-                up_temp = 0
-                for j in range(np.shape(y)[1]):
-                    up_temp = up_temp + self.division(y[n][j],
-                                                      y_hat[n][j]) * h[k][j]
-
-                down_temp = 0
-                for j in range(np.shape(y)[1]):
-                    down_temp = down_temp + h[k][j]
-
-                a_new[n][k] = a[n][k] * self.division(up_temp, down_temp)
-
-        return a_new
+        return _ops.calculate_a_new(y, y_hat, a, h)
 
     def _calculate_a_new_extended_sparse(self, y, y_hat, a, h):
         """
@@ -2606,23 +2504,7 @@ class factorization:
         The updated version of the 'b' matrix.
         """
 
-        b_new = np.zeros(shape=(np.shape(b)))
-
-        for k in range(np.shape(b)[0]):
-            for m in range(np.shape(b)[1]):
-
-                up_temp = 0
-                for i in range(np.shape(z)[0]):
-                    up_temp = up_temp + self.division(z[i][m],
-                                                      z_hat[i][m]) * w[i][k]
-
-                down_temp = 0
-                for i in range(np.shape(z)[0]):
-                    down_temp = down_temp + w[i][k]
-
-                b_new[k][m] = b[k][m] * self.division(up_temp, down_temp)
-
-        return b_new
+        return _ops.calculate_b_new(z, z_hat, b, w)
 
     def _calculate_b_new_extended_sparse(self, z, z_hat, b, w):
         """
