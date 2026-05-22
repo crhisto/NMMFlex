@@ -51,8 +51,35 @@ Once installed, you can import and use the NMMFlexPy package in your Python code
 ```python
 from NMMFlex import factorization, grid_search
 
-# Use the functionalities provided by NMMFlex
+# Default numpy backend -- existing behaviour, no extra dependencies.
+f = factorization()
 ```
+
+### Choosing a backend
+
+`factorization` accepts an optional `backend=` keyword. The numpy
+backend is the default and is what every existing caller (including
+DecoFlex) sees unless they opt in. The PyTorch backend routes the
+multiplicative-update rules through `NMMFlex.ops` so they run on a
+chosen device:
+
+```python
+# CPU torch backend
+f = factorization(backend='torch', device='cpu')
+
+# GPU (CUDA) -- requires `pip install NMMFlex[torch]` and a CUDA build
+# of torch.
+f = factorization(backend='torch', device='cuda')
+
+# Apple Silicon (MPS)
+f = factorization(backend='torch', device='mps')
+```
+
+As of this release the `backend='torch'` switch is honoured by the
+simple `run_deconvolution(x, k)` path. The multi-matrix
+`run_deconvolution_multiple` still uses numpy internally regardless
+of the flag (it warns when called with a non-numpy backend); torch
+coverage there is being widened incrementally.
 
 For detailed documentation, please refer to the [NMMFlex Documentation](https://html-preview.github.io/?url=https://github.com/crhisto/NMMFlex/blob/main/NMMFlexPy/src/docs/build/index.html).
 

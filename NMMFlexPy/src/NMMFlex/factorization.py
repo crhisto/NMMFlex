@@ -22,6 +22,9 @@ from sklearn import preprocessing
 from sklearn.preprocessing import quantile_transform, StandardScaler
 from sklearn.utils.validation import check_non_negative
 
+from . import _backend as _B
+from . import ops as _ops
+
 # This is related with the warning: "FutureWarning: elementwise comparison
 # failed; returning scalar, but in the future will perform elementwise
 # comparison". You can check the original issue:
@@ -115,8 +118,92 @@ class factorization:
     beta = None
     alpha_regularizer_w = None
 
-    def __init__(self):
-        pass
+    _VALID_BACKENDS = ('numpy', 'torch')
+
+    def __init__(self, backend: str = 'numpy', device: str = 'cpu',
+                 dtype=None):
+        """
+        Parameters
+        ----------
+        backend : {'numpy', 'torch'}
+            Which tensor backend to use for the multiplicative update
+            rules. ``'numpy'`` (default) preserves the historical
+            behaviour and is what DecoFlex and any other downstream
+            consumers see by default. ``'torch'`` routes the supported
+            update methods through ``NMMFlex.ops`` so they run on
+            PyTorch tensors (CPU, CUDA, or MPS).
+        device : str
+            Device passed to ``torch.Tensor.to`` when ``backend='torch'``
+            (e.g. ``'cpu'``, ``'cuda'``, ``'mps'``). Ignored otherwise.
+        dtype : optional
+            Dtype to use for internal computation. For numpy this is a
+            ``numpy.dtype``; for torch it is a ``torch.dtype``. ``None``
+            preserves the input dtype (numpy) or float64 (torch).
+
+        Notes
+        -----
+        Backend coverage is being widened incrementally. As of this
+        release, ``backend='torch'`` is honoured by
+        ``run_deconvolution`` (the simple X-only path). The
+        multi-matrix ``run_deconvolution_multiple`` still runs on numpy
+        regardless of this flag; setting ``backend='torch'`` there will
+        log a warning and fall back to numpy. Subsequent commits will
+        widen torch coverage.
+        """
+        if backend not in self._VALID_BACKENDS:
+            raise ValueError(
+                f"Unknown backend {backend!r}. Valid choices: "
+                f"{self._VALID_BACKENDS}"
+            )
+        if backend == 'torch' and not _B.has_torch():
+            raise RuntimeError(
+                "backend='torch' requires PyTorch. "
+                "Install with `pip install NMMFlex[torch]`."
+            )
+        self._backend_name = backend
+        self._device = device
+        self._dtype = dtype
+
+    @property
+    def backend(self) -> str:
+        return self._backend_name
+
+    def _to_backend(self, arr):
+        """Convert a numpy-like input to the active backend's tensor
+        type. Numpy arrays pass through unchanged when backend='numpy';
+        when backend='torch' they become tensors on the configured
+        device with the configured dtype."""
+        if self._backend_name == 'numpy':
+            out = np.asarray(arr)
+            if self._dtype is not None:
+                out = out.astype(self._dtype)
+            return out
+        # torch path
+        import torch  # local import: torch is optional
+        if isinstance(arr, torch.Tensor):
+            t = arr
+        else:
+            t = torch.from_numpy(np.asarray(arr))
+        if self._dtype is not None:
+            t = t.to(dtype=self._dtype)
+        else:
+            t = t.to(dtype=torch.float64)
+        return t.to(device=self._device)
+
+    def _from_backend(self, arr):
+        """Convert an internal tensor back to a numpy array for users
+        and for storage on ``self.w`` / ``self.h``."""
+        if _B.is_torch(arr):
+            return arr.detach().cpu().numpy()
+        return np.asarray(arr)
+
+    def _random_like(self, shape):
+        """Random uniform [0, 1) tensor in the active backend."""
+        if self._backend_name == 'numpy':
+            return np.random.rand(*shape)
+        import torch
+        dtype = self._dtype if self._dtype is not None else torch.float64
+        return torch.rand(*shape, device=self._device, dtype=dtype)
 
     @deprecation.deprecated("Use the function run_deconvolution_multiple with "
                             "delta_threshold and beta parameters set to zero.")
@@ -163,55 +250,53 @@ class factorization:
                 progress messages are printed during the deconvolution.
         """
 
-        print("Non-Negative multiple matrix factorization: Simple setup")
+        print(f"Non-Negative multiple matrix factorization: Simple setup "
+              f"(backend={self._backend_name})")
 
-        x = np.array(x_matrix)
-        # I assign the number of columns and rows
-        w = np.random.rand(np.shape(x)[0], k)
-        h = np.random.rand(k, np.shape(x)[1])
-
-        # Creating the dynamic variables with the correct sizing.
-        x_hat = np.zeros(shape=(np.shape(x)))
-        w_new = np.zeros(shape=(np.shape(w)))
-        h_new = np.zeros(shape=(np.shape(h)))
+        # Convert input to the active backend. Numpy backend is a
+        # passthrough; torch backend uploads to the configured device.
+        x = self._to_backend(x_matrix)
+        # Initial random W and H in the active backend.
+        w = self._random_like((x.shape[0], k))
+        h = self._random_like((k, x.shape[1]))
 
         iterations = 0
-        divergence_value = 1
-        delta_divergence_value = 1
+        divergence_value = 1.0
+        delta_divergence_value = 1.0
         running_info = np.empty((0, 3), float)
-        # The optimization is going to end until we reach a good fit or a max
-        # number of iterations.
-        while np.abs(delta_divergence_value) > delta_threshold and \
-                iterations <= max_iterations:
-            # Calculation of each main variable in the order expected
-            x_hat = self._calculate_x_hat(w, h)
 
-            divergence_matrix = self._calculate_divergence_generic(x, x_hat,
-                                                                   False)
-            divergence_actual_value = np.sum(divergence_matrix)
-            delta_divergence_value = np.abs(divergence_actual_value -
-                                            divergence_value)
+        # The optimization is going to end until we reach a good fit or a
+        # max number of iterations.
+        while abs(delta_divergence_value) > delta_threshold and \
+                iterations <= max_iterations:
+            # Reconstruction X̂ = W @ H.
+            x_hat = _ops.calculate_x_hat(w, h)
+
+            divergence_actual_value = _B.to_python_float(
+                _B.sum(_ops.calculate_divergence(x, x_hat))
+            )
+            delta_divergence_value = abs(
+                divergence_actual_value - divergence_value
+            )
             divergence_value = divergence_actual_value
 
-            # Add an object with the values of iterations, divergence and
-            # delta to plot it and see performance
+            # Track per-iteration metrics in numpy (small overhead, easy
+            # to inspect after the run).
             current_loop = np.array([[iterations, divergence_value,
                                       delta_divergence_value]])
             running_info = np.append(running_info, current_loop, axis=0)
 
-            # To print the procedure status each 100 iterations
             if iterations % print_limit == 0:
                 print("Iteration: ", iterations, " Divergence: ",
                       divergence_value, "Delta divergence: ",
                       delta_divergence_value)
 
-            # Calculate the new values for the w and h matrices
-            w_new = self._calculate_w_new_extended(x, x_hat, w, h)
-            # I apply the constraint where the H matrix is a proportion matrix
-            # for each column,
-            h_new = self._calculate_h_new_extended(x, x_hat, w, h, True)
+            # Multiplicative updates via the backend-agnostic ops.
+            w_new = _ops.calculate_w_new(x, x_hat, w, h)
+            h_new = _ops.calculate_h_new(x, x_hat, w, h)
+            # Proportion constraint on H: each column sums to 1.
+            h_new = h_new / _B.expand_dims(_B.sum(h_new, axis=0), 0)
 
-            # Assign the new values to the original variables w and h.
             w = w_new
             h = h_new
 
@@ -220,8 +305,17 @@ class factorization:
         print("The process finished!")
         print('iterations: ', iterations, ' Divergence: ', divergence_value,
               ' Delta divergence: ', delta_divergence_value)
-        self.w = w_new
-        self.h = h_new
+        # Store results back as numpy for compatibility with the rest of
+        # the class state and with downstream consumers.
+        self.w = self._from_backend(w_new)
+        self.h = self._from_backend(h_new)
+        self.x_hat = self._from_backend(x_hat)
+        self.iterations = iterations
+        self.divergence_value = divergence_value
+        self.delta_divergence_value = delta_divergence_value
+        self.running_info = running_info
+
+        return self
         self.x_hat = x_hat
         self.iterations = iterations
         self.divergence_value = divergence_value
@@ -399,6 +493,21 @@ class factorization:
 
         """
         print(__version__)
+        # Backend coverage note: the multi-matrix path still relies on
+        # numpy/scipy primitives for sparse handling, fixed-matrix
+        # masking, regularization, and the alpha/beta update rules.
+        # Falling back to numpy here keeps the behaviour predictable
+        # until those internals are vectorized through ops/_backend.
+        if self._backend_name != 'numpy':
+            import warnings
+            warnings.warn(
+                "backend='%s' is not yet honoured by "
+                "run_deconvolution_multiple; falling back to numpy for "
+                "this call." % self._backend_name,
+                RuntimeWarning,
+                stacklevel=2,
+            )
+
         # 1. Now It's time to convert the matrices in a format where Zero and
         # null values are treated differently.
         if x_matrix is not None:

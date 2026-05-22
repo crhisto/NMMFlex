@@ -87,6 +87,22 @@ def full_like(x, fill_value):
     return np.full_like(x, fill_value, dtype=np.result_type(x, np.float64))
 
 
+def abs(x):
+    if is_torch(x):
+        return _torch.abs(x)
+    return np.abs(x)
+
+
+def to_python_float(x) -> float:
+    """Coerce a 0-D numpy array or torch scalar tensor to a Python
+    float, so iteration-loop tracking can use plain Python arithmetic
+    on convergence metrics without dragging tensors around.
+    """
+    if is_torch(x):
+        return float(x.item() if x.ndim == 0 else x.detach().cpu().numpy())
+    return float(x)
+
+
 def expand_dims(x, axis: int):
     """Add a singleton dimension at ``axis``. Matches np.expand_dims /
     torch.unsqueeze. Convenience wrapper because they look different
